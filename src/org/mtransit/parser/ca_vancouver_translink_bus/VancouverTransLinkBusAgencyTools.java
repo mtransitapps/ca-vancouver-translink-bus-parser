@@ -107,10 +107,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteShortName(GRoute gRoute) {
-		if (Utils.isDigitsOnly(gRoute.route_short_name)) {
-			return String.valueOf(Integer.parseInt(gRoute.route_short_name)); // remove leading '0'
-		}
-		return super.getRouteShortName(gRoute);
+		String routeShortName = gRoute.route_short_name; // used by real-time API
+		if (Utils.isDigitsOnly(routeShortName)) { // used by real-time API
+			routeShortName = String.valueOf(Integer.valueOf(routeShortName)); // used by real-time API
+		} // used by real-time API
+		return routeShortName; // used by real-time API
 	}
 
 	@Override
@@ -131,7 +132,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	private static final String NIGHT_BUS_COLOR = "062F53"; // DARK BLUE (from PDF map)
-	private static final String B_LINE_BUS_COLOR = "746717"; // DARK BLUE (from PDF map)
+	private static final String B_LINE_BUS_COLOR = "F46717"; // ORANGE (from PDF map)
 
 	private static final String B_LINE = "B-LINE";
 
@@ -282,7 +283,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public int getStopId(GStop gStop) {
-		if (Utils.isDigitsOnly(gStop.stop_code)) {
+		if (!StringUtils.isEmpty(gStop.stop_code) && Utils.isDigitsOnly(gStop.stop_code)) {
 			return Integer.parseInt(gStop.stop_code); // using stop code as stop ID
 		}
 		return 1000000 + Integer.parseInt(gStop.stop_id);
