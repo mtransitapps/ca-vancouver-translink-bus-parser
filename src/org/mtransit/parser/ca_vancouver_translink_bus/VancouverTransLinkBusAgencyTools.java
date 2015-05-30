@@ -147,6 +147,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		return super.getRouteColor(gRoute);
 	}
 
+
 	@Override
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
 		if (mRoute.id == 606l) {
@@ -241,11 +242,17 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern STARTS_WITH_ROUTE = Pattern.compile("(^[0-9A-Z]{1,4}[\\s]{1})", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern TO = Pattern.compile("((^|[\\s]){1}(to)[\\s]*)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern TO = Pattern.compile("([^|\\s]{1}(to)[\\s]*)", Pattern.CASE_INSENSITIVE);
 
 	private static final String SPACE = " ";
 
-	private static final Pattern NIGHTBUS = Pattern.compile("((^|[\\s]){1}(nightbus)[\\s|$]{1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern NIGHTBUS = Pattern.compile("([^|\\s]{1}(nightbus)[\\s|$]{1})", Pattern.CASE_INSENSITIVE);
+
+	private static final Pattern EXCHANGE = Pattern.compile("([^|\\s]{1}(exchange)[\\s|$]{1})", Pattern.CASE_INSENSITIVE);
+
+	private static final String EXCHANGE_SHORT = "Exch"; // like in GTFS
+
+	private static final Pattern ENDS_WITH_B_LINE = Pattern.compile("(\\ - b\\-line$)", Pattern.CASE_INSENSITIVE);
 
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
@@ -254,8 +261,10 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = ENDS_WITH_QUOTE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = STARTS_WITH_ROUTE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = ENDS_WITH_VIA.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
+		tripHeadsign = ENDS_WITH_B_LINE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = TO.matcher(tripHeadsign).replaceAll(SPACE);
 		tripHeadsign = AND.matcher(tripHeadsign).replaceAll(AND_REPLACEMENT);
+		tripHeadsign = EXCHANGE.matcher(tripHeadsign).replaceAll(EXCHANGE_SHORT);
 		tripHeadsign = NIGHTBUS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		return MSpec.cleanLabel(tripHeadsign);
 	}
@@ -270,6 +279,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern UNLOADING = Pattern.compile("(unloading( only)?$)", Pattern.CASE_INSENSITIVE);
 
+	private static final Pattern ENDS_WITH_DASHES = Pattern.compile("([\\-]+$)", Pattern.CASE_INSENSITIVE);
+
 	@Override
 	public String cleanStopName(String gStopName) {
 		gStopName = gStopName.toLowerCase(Locale.ENGLISH);
@@ -277,6 +288,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		gStopName = AT.matcher(gStopName).replaceAll(AT_REPLACEMENT);
 		gStopName = AND.matcher(gStopName).replaceAll(AND_REPLACEMENT);
 		gStopName = UNLOADING.matcher(gStopName).replaceAll(StringUtils.EMPTY);
+		gStopName = ENDS_WITH_DASHES.matcher(gStopName).replaceAll(StringUtils.EMPTY);
+		gStopName = EXCHANGE.matcher(gStopName).replaceAll(EXCHANGE_SHORT);
 		gStopName = MSpec.cleanStreetTypes(gStopName);
 		return MSpec.cleanLabel(gStopName);
 	}
