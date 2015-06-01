@@ -241,7 +241,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern STARTS_WITH_ROUTE = Pattern.compile("(^[0-9A-Z]{1,4}[\\s]{1})", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern TO = Pattern.compile("([^|\\s]{1}(to)[\\s]*)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern TO = Pattern.compile("((^|\\s){1}(to)[\\s]+)", Pattern.CASE_INSENSITIVE);
 
 	private static final String SPACE = " ";
 
