@@ -39,11 +39,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public void start(String[] args) {
-		System.out.printf("Generating TransLink bus data...\n");
+		System.out.printf("\nGenerating TransLink bus data...");
 		long start = System.currentTimeMillis();
 		this.serviceIds = extractUsefulServiceIds(args, this);
 		super.start(args);
-		System.out.printf("Generating TransLink bus data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+		System.out.printf("\nGenerating TransLink bus data... DONE in %s.", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		if (Utils.isDigitsOnly(gRoute.route_short_name)) {
 			return Long.parseLong(gRoute.route_short_name); // use route short name as route ID
 		}
-		Matcher matcher = DIGITS.matcher(gRoute.route_id);
+		Matcher matcher = DIGITS.matcher(gRoute.route_short_name);
 		matcher.find();
 		long id = Long.parseLong(matcher.group());
 		if (gRoute.route_short_name.startsWith(C)) {
@@ -99,7 +99,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (gRoute.route_short_name.startsWith(P)) {
 			return RID_SW_P + id;
 		}
-		System.out.println("Unexpected route ID " + gRoute);
+		System.out.printf("\nUnexpected route ID %s\n", gRoute);
 		System.exit(-1);
 		return -1l;
 	}
@@ -229,6 +229,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignDirection(MDirectionType.WEST);
 				return;
 			}
+		} else if (mRoute.id == 895l) {
+			if (gTrip.direction_id == 0) {
+				mTrip.setHeadsignDirection(MDirectionType.EAST);
+				return;
+			} else if (gTrip.direction_id == 1) {
+				mTrip.setHeadsignDirection(MDirectionType.WEST);
+				return;
+			}
 		}
 		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.trip_headsign), gTrip.direction_id);
 	}
@@ -245,11 +253,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final String SPACE = " ";
 
-	private static final Pattern NIGHTBUS = Pattern.compile("([^|\\s]{1}(nightbus)[\\s|$]{1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern EXPRESS = Pattern.compile("((^|\\s){1}(express)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern EXCHANGE = Pattern.compile("([^|\\s]{1}(exchange)[\\s|$]{1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern NIGHTBUS = Pattern.compile("((^|\\s){1}(nightbus)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
-	private static final String EXCHANGE_SHORT = "Exch"; // like in GTFS
+	private static final Pattern EXCHANGE = Pattern.compile("((^|\\s){1}(exchange)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String EXCHANGE_REPLACEMENT = "$2Exch$4"; // like in GTFS
 
 	private static final Pattern ENDS_WITH_B_LINE = Pattern.compile("(\\ - b\\-line$)", Pattern.CASE_INSENSITIVE);
 
@@ -263,8 +272,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = ENDS_WITH_B_LINE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = TO.matcher(tripHeadsign).replaceAll(SPACE);
 		tripHeadsign = AND.matcher(tripHeadsign).replaceAll(AND_REPLACEMENT);
-		tripHeadsign = EXCHANGE.matcher(tripHeadsign).replaceAll(EXCHANGE_SHORT);
+		tripHeadsign = EXCHANGE.matcher(tripHeadsign).replaceAll(EXCHANGE_REPLACEMENT);
 		tripHeadsign = NIGHTBUS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
+		tripHeadsign = EXPRESS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
+		tripHeadsign = MSpec.cleanNumbers(tripHeadsign);
+		tripHeadsign = MSpec.cleanStreetTypes(tripHeadsign);
 		return MSpec.cleanLabel(tripHeadsign);
 	}
 
@@ -288,7 +300,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		gStopName = AND.matcher(gStopName).replaceAll(AND_REPLACEMENT);
 		gStopName = UNLOADING.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = ENDS_WITH_DASHES.matcher(gStopName).replaceAll(StringUtils.EMPTY);
-		gStopName = EXCHANGE.matcher(gStopName).replaceAll(EXCHANGE_SHORT);
+		gStopName = EXCHANGE.matcher(gStopName).replaceAll(EXCHANGE_REPLACEMENT);
 		gStopName = MSpec.cleanStreetTypes(gStopName);
 		return MSpec.cleanLabel(gStopName);
 	}
