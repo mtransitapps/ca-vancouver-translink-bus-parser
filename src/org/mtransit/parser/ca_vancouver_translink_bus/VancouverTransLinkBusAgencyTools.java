@@ -1,6 +1,8 @@
 package org.mtransit.parser.ca_vancouver_translink_bus;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,6 +62,16 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			return excludeUselessCalendarDate(gCalendarDates, this.serviceIds);
 		}
 		return super.excludeCalendarDate(gCalendarDates);
+	}
+
+	private static final List<String> EXCLUDE_RSN = Arrays.asList(new String[] { "980", "996", "997", "998", "999" });
+
+	@Override
+	public boolean excludeRoute(GRoute gRoute) {
+		if (EXCLUDE_RSN.contains(gRoute.route_short_name)) {
+			return true;
+		}
+		return super.excludeRoute(gRoute);
 	}
 
 	@Override
@@ -143,7 +155,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		if (gRoute.route_long_name.contains(B_LINE)) {
 			return B_LINE_BUS_COLOR;
 		}
-		return super.getRouteColor(gRoute);
+		return null; // use agency color
 	}
 
 
