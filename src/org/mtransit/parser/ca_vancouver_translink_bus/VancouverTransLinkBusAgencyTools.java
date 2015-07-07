@@ -19,7 +19,7 @@ import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MDirectionType;
 import org.mtransit.parser.mt.data.MRoute;
-import org.mtransit.parser.mt.data.MSpec;
+import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.mt.data.MTrip;
 
 // http://www.translink.ca/en/Schedules-and-Maps/Developer-Resources.aspx
@@ -129,8 +129,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	public String getRouteLongName(GRoute gRoute) {
 		String gRouteLongName = gRoute.route_long_name;
 		gRouteLongName = gRouteLongName.toLowerCase(Locale.ENGLISH);
-		gRouteLongName = MSpec.CLEAN_SLASHES.matcher(gRouteLongName).replaceAll(MSpec.CLEAN_SLASHES_REPLACEMENT);
-		return MSpec.cleanLabel(gRouteLongName);
+		gRouteLongName = CleanUtils.CLEAN_SLASHES.matcher(gRouteLongName).replaceAll(CleanUtils.CLEAN_SLASHES_REPLACEMENT);
+		return CleanUtils.cleanLabel(gRouteLongName);
 	}
 
 	private static final String AGENCY_COLOR_BLUE = "0761A5"; // BLUE (merge)
@@ -832,6 +832,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern ENDS_WITH_B_LINE = Pattern.compile("((^|\\s){1}(\\- b\\-line)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
+	private static final Pattern CLEAN_SLASHES = Pattern.compile("(\\S)[\\s]*[/][\\s]*(\\S)");
+	private static final String CLEAN_SLASHES_REPLACEMENT = "$1 / $2";
+
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
 		tripHeadsign = tripHeadsign.toLowerCase(Locale.ENGLISH);
@@ -848,9 +851,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = EXPRESS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = SPECIAL.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = ONLY.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
-		tripHeadsign = MSpec.cleanNumbers(tripHeadsign);
-		tripHeadsign = MSpec.cleanStreetTypes(tripHeadsign);
-		return MSpec.cleanLabel(tripHeadsign);
+		tripHeadsign = CleanUtils.cleanNumbers(tripHeadsign);
+		tripHeadsign = CleanUtils.cleanStreetTypes(tripHeadsign);
+		return CleanUtils.cleanLabel(tripHeadsign);
 	}
 
 	private static final Pattern AND = Pattern.compile("( and )", Pattern.CASE_INSENSITIVE);
@@ -874,8 +877,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		gStopName = UNLOADING.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = ENDS_WITH_DASHES.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = EXCHANGE.matcher(gStopName).replaceAll(EXCHANGE_REPLACEMENT);
-		gStopName = MSpec.cleanStreetTypes(gStopName);
-		return MSpec.cleanLabel(gStopName);
+		gStopName = CleanUtils.cleanStreetTypes(gStopName);
+		return CleanUtils.cleanLabel(gStopName);
 	}
 
 	@Override
