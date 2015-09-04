@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
@@ -19,7 +20,6 @@ import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MDirectionType;
 import org.mtransit.parser.mt.data.MRoute;
-import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.mt.data.MTrip;
 
 // http://www.translink.ca/en/Schedules-and-Maps/Developer-Resources.aspx
@@ -236,6 +236,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String EDMONDS_STN = "Edmonds Stn";
 	private static final String ANNACIS_ISL = "Annacis Isl";
 	private static final String MAPLE_MDWS_STN_MEADOWTOWN = MAPLE_MDWS_STN + SLASH + MEADOWTOWN;
+	private static final String _29TH_AVE_STN = "29th Ave Stn";
+	private static final String _15TH_ST = "15th St";
+	private static final String GUILDFORD = "Guildford";
+	private static final String INGLEWOOD = "Inglewood";
+	private static final String SPECIAL_ = "SPECIAL";
 
 	@Override
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
@@ -287,7 +292,10 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return;
 			}
 		} else if (mRoute.id == 16l) {
-			if (gTrip.getDirectionId() == 1) {
+			if (gTrip.getDirectionId() == 0) {
+				mTrip.setHeadsignString(_29TH_AVE_STN, gTrip.getDirectionId());
+				return;
+			} else if (gTrip.getDirectionId() == 1) {
 				mTrip.setHeadsignString(ARBUTUS, gTrip.getDirectionId());
 				return;
 			}
@@ -371,13 +379,21 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return;
 			}
 		} else if (mRoute.id == 110l) {
-			if (gTrip.getDirectionId() == 1) {
+			if (gTrip.getDirectionId() == 0) {
+				mTrip.setHeadsignString(LOUGHEED_STN, gTrip.getDirectionId());
+				return;
+			} else if (gTrip.getDirectionId() == 1) {
 				mTrip.setHeadsignString(METROTOWN_STN, gTrip.getDirectionId());
 				return;
 			}
 		} else if (mRoute.id == 112l) {
 			if (gTrip.getDirectionId() == 1) {
 				mTrip.setHeadsignString(EDMONDS_STN, gTrip.getDirectionId());
+				return;
+			}
+		} else if (mRoute.id == 123l) {
+			if (gTrip.getDirectionId() == 1) {
+				mTrip.setHeadsignString(BRENTWOOD_STN, gTrip.getDirectionId());
 				return;
 			}
 		} else if (mRoute.id == 130l) {
@@ -414,6 +430,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(VANCOUVER, gTrip.getDirectionId());
 				return;
 			}
+		} else if (mRoute.id == 214l) {
+			if (gTrip.getDirectionId() == 1) {
+				mTrip.setHeadsignString(VANCOUVER + SLASH + PHIBBS_EXCH, gTrip.getDirectionId());
+				return;
+			}
 		} else if (mRoute.id == 227l) {
 			if (gTrip.getDirectionId() == 1) {
 				mTrip.setHeadsignString(PHIBBS_EXCH, gTrip.getDirectionId());
@@ -448,7 +469,10 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return;
 			}
 		} else if (mRoute.id == 240l) {
-			if (gTrip.getDirectionId() == 1) {
+			if (gTrip.getDirectionId() == 0) {
+				mTrip.setHeadsignString(_15TH_ST, gTrip.getDirectionId());
+				return;
+			} else if (gTrip.getDirectionId() == 1) {
 				mTrip.setHeadsignString(VANCOUVER, gTrip.getDirectionId());
 				return;
 			}
@@ -476,6 +500,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return;
 			} else if (gTrip.getDirectionId() == 1) {
 				mTrip.setHeadsignString(HORSESHOE_BAY, gTrip.getDirectionId());
+				return;
+			}
+		} else if (mRoute.id == 252l) {
+			if (gTrip.getDirectionId() == 1) {
+				mTrip.setHeadsignString(INGLEWOOD, gTrip.getDirectionId());
 				return;
 			}
 		} else if (mRoute.id == 253l) {
@@ -551,6 +580,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mRoute.id == 335l) {
 			if (gTrip.getDirectionId() == 0) {
 				mTrip.setHeadsignString(NEWTON_EXCH, gTrip.getDirectionId());
+				return;
+			}
+		} else if (mRoute.id == 341l) {
+			if (gTrip.getDirectionId() == 0) {
+				mTrip.setHeadsignString(GUILDFORD, gTrip.getDirectionId());
 				return;
 			}
 		} else if (mRoute.id == 351l) {
@@ -686,6 +720,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignDirection(MDirectionType.SOUTH);
 				return;
 			}
+		} else if (mRoute.id == 848l) {
+			if (SPECIAL_.equalsIgnoreCase(gTrip.getTripHeadsign())) {
+				mTrip.setHeadsignDirection(MDirectionType.WEST);
+				return;
+			}
+			System.out.printf("\nUnexpected trip %s\n", gTrip);
+			System.exit(-1);
+			return;
 		} else if (mRoute.id == 855l) {
 			if (gTrip.getDirectionId() == 0) {
 				mTrip.setHeadsignDirection(MDirectionType.EAST);
@@ -702,6 +744,22 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignDirection(MDirectionType.SOUTH);
 				return;
 			}
+		} else if (mRoute.id == 863l) {
+			if (SPECIAL_.equalsIgnoreCase(gTrip.getTripHeadsign())) {
+				mTrip.setHeadsignDirection(MDirectionType.WEST);
+				return;
+			}
+			System.out.printf("\nUnexpected trip %s\n", gTrip);
+			System.exit(-1);
+			return;
+		} else if (mRoute.id == 865l) {
+			if (SPECIAL_.equalsIgnoreCase(gTrip.getTripHeadsign())) {
+				mTrip.setHeadsignDirection(MDirectionType.WEST);
+				return;
+			}
+			System.out.printf("\nUnexpected trip %s\n", gTrip);
+			System.exit(-1);
+			return;
 		} else if (mRoute.id == 867l) {
 			if (gTrip.getDirectionId() == 0) {
 				mTrip.setHeadsignDirection(MDirectionType.NORTH);
@@ -834,6 +892,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern ENDS_WITH_B_LINE = Pattern.compile("((^|\\s){1}(\\- b\\-line)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
+	private static final Pattern UBC_LC = Pattern.compile("((^|\\s){1}(ubc)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String UBC_LC_REPLACEMENT = "$2" + UBC + "$4";
+
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
 		tripHeadsign = tripHeadsign.toLowerCase(Locale.ENGLISH);
@@ -845,7 +906,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = ENDS_WITH_B_LINE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = TO.matcher(tripHeadsign).replaceAll(SPACE);
 		tripHeadsign = AND.matcher(tripHeadsign).replaceAll(AND_REPLACEMENT);
+		tripHeadsign = AT.matcher(tripHeadsign).replaceAll(AT_REPLACEMENT);
 		tripHeadsign = EXCHANGE.matcher(tripHeadsign).replaceAll(EXCHANGE_REPLACEMENT);
+		tripHeadsign = UBC_LC.matcher(tripHeadsign).replaceAll(UBC_LC_REPLACEMENT);
 		tripHeadsign = NIGHTBUS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = EXPRESS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = SPECIAL.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
