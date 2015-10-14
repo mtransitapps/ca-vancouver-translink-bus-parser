@@ -1,6 +1,8 @@
 package org.mtransit.parser.ca_vancouver_translink_bus;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -10,6 +12,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
+import org.mtransit.parser.Pair;
+import org.mtransit.parser.SplitUtils;
+import org.mtransit.parser.SplitUtils.RouteTripSpec;
 import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
 import org.mtransit.parser.gtfs.data.GCalendarDate;
@@ -17,10 +22,12 @@ import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.gtfs.data.GSpec;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
+import org.mtransit.parser.gtfs.data.GTripStop;
 import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MDirectionType;
 import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
+import org.mtransit.parser.mt.data.MTripStop;
 
 // http://www.translink.ca/en/Schedules-and-Maps/Developer-Resources.aspx
 // http://www.translink.ca/en/Schedules-and-Maps/Developer-Resources/GTFS-Data.aspx
@@ -94,6 +101,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String C = "C";
 	private static final String N = "N";
 	private static final String P = "P";
+
 	private static final long RID_SW_C = 30000;
 	private static final long RID_SW_N = 140000;
 	private static final long RID_SW_P = 160000;
@@ -104,14 +112,15 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			return Long.parseLong(gRoute.getRouteShortName()); // use route short name as route ID
 		}
 		Matcher matcher = DIGITS.matcher(gRoute.getRouteShortName());
-		matcher.find();
-		long id = Long.parseLong(matcher.group());
-		if (gRoute.getRouteShortName().startsWith(C)) {
-			return RID_SW_C + id;
-		} else if (gRoute.getRouteShortName().startsWith(N)) {
-			return RID_SW_N + id;
-		} else if (gRoute.getRouteShortName().startsWith(P)) {
-			return RID_SW_P + id;
+		if (matcher.find()) {
+			long id = Long.parseLong(matcher.group());
+			if (gRoute.getRouteShortName().startsWith(C)) {
+				return RID_SW_C + id;
+			} else if (gRoute.getRouteShortName().startsWith(N)) {
+				return RID_SW_N + id;
+			} else if (gRoute.getRouteShortName().startsWith(P)) {
+				return RID_SW_P + id;
+			}
 		}
 		System.out.printf("\nUnexpected route ID %s\n", gRoute);
 		System.exit(-1);
@@ -160,17 +169,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		return null; // use agency color
 	}
 
-	private static final String SLASH = " / ";
-
 	private static final String ALBION = "Albion";
-	private static final String HANEY_PL = "Haney Pl";
-	private static final String MAPLE_MDWS_STN = "Maple Mdws Stn";
+	private static final String HANEY_PLACE = "Haney Pl";
 	private static final String MEADOWTOWN = "Meadowtown";
 	private static final String POCO_STN = "Poco Stn";
 	private static final String POCO_SOUTH = "Poco South";
 	private static final String BELCARRA = "Belcarra";
 	private static final String PT_MOODY_STN = "Pt Moody Stn";
-	private static final String IOCO = "Ioco";
 	private static final String LIONS_BAY = "Lions Bay";
 	private static final String MAPLE_RDG_EAST = "Maple Rdg East";
 	private static final String LADNER_EXCH = "Ladner Exch";
@@ -181,470 +186,194 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String BRIGHOUSE_STN = "Brighouse Stn";
 	private static final String FOUR_RD = "Four Rd";
 	private static final String BRIDGEPORT_STN = "Bridgeport Stn";
-	private static final String CR_BEACH = "Cr Beach";
-	private static final String WHITBY_ESTS = "Whitby Ests";
+	private static final String RIVERSIDE = "Riverside";
+	private static final String CRESCENT_BEACH = "Cr Beach";
+	private static final String WHITBY_ESTATES = "Whitby Ests";
 	private static final String WHITE_ROCK = "White Rock";
+	private static final String NEW_WEST_STN = "New West Stn";
 	private static final String NEWTON_EXCH = "Newton Exch";
-	private static final String NEWTON_EXCH_WHITE_ROCK = NEWTON_EXCH + SLASH + WHITE_ROCK;
 	private static final String SURREY_CENTRAL_STN = "Surrey Ctrl Stn";
 	private static final String LANGLEY_CTR = "Langley Ctr";
+	private static final String SOUTH_DELTA = "South Delta";
+	private static final String BROOKSWOOD = "Brookswood";
 	private static final String SUNBURY = "Sunbury";
 	private static final String SPURAWAY = "Spuraway";
 	private static final String DUNDARAVE = "Dundarave";
 	private static final String BRITISH_PROPERTIES = "British Properties";
-	private static final String UPPER_CAPILANO = "Upper Capilano";
 	private static final String GROUSE_MTN = "Grouse Mtn";
 	private static final String UPPER_LONSDALE = "Upper Lonsdale";
 	private static final String LONSDALE_QUAY = "Lonsdale Quay";
-	private static final String UPPER_LYNN_VLY = "Upper Lynn Vly";
-	private static final String PORT_COQUITLAM_STN = "Port Coquitlam Stn";
+	private static final String UPPER_LYNN_VALLEY = "Upper Lynn Vly";
 	private static final String VANCOUVER = "Vancouver";
 	private static final String HORSESHOE_BAY = "Horseshoe Bay";
 	private static final String CAPILANO_U = "Capilano U";
-	private static final String PK_ROYAL = "Pk Royal";
-	private static final String SPURAWAY_PK_ROYAL = SPURAWAY + SLASH + PK_ROYAL;
-	private static final String VANCOUVER_PK_ROYAL = VANCOUVER + SLASH + PK_ROYAL;
-	private static final String GDN_CITY = "Gdn City";
-	private static final String ONE_RD = "One Rd";
+	private static final String PARK_ROYAL = "Pk Royal";
+	private static final String GARDEN_CITY = "Gdn City";
 	private static final String RAILWAY = "Railway";
 	private static final String _22ND_ST_STN = "22nd St Stn";
 	private static final String DOWNTOWN = "Downtown";
 	private static final String HASTINGS = "Hastings";
-	private static final String HASTINGS_DOWNTOWN = HASTINGS + SLASH + DOWNTOWN;
 	private static final String POWELL = "Powell";
 	private static final String UBC = "UBC";
-	private static final String CROWN = "Crown";
-	private static final String PHIBBS_EXCH = "Phibbs Exch";
 	private static final String JOYCE_STN = "Joyce Stn";
 	private static final String KOOTENAY_LOOP = "Kootenay Loop";
 	private static final String BRENTWOOD_STN = "Brentwood Stn";
+	private static final String BRAID_STN = "Braid Stn";
+	private static final String COQ_STN = "Coq Stn";
 	private static final String MACDONALD = "Macdonald";
 	private static final String KNIGHT = "Knight";
 	private static final String VICTORIA = "Victoria";
+	private static final String LAKE_CITY_STN = "Lk City Stn";
 	private static final String METROTOWN_STN = "Metrotown Stn";
 	private static final String STANLEY_PK = "Stanley Pk";
-	private static final String CROWN_UBC = CROWN + SLASH + UBC;
-	private static final String COMM_L_BDWAY_STN = "Comm''l-Bdway Stn";
-	private static final String ALMA = "Alma";
 	private static final String BOUNDARY = "Boundary";
-	private static final String COMM_L_BDWAY_STN_BOUNDARY = COMM_L_BDWAY_STN + SLASH + BOUNDARY;
 	private static final String GRANVILLE = "Granville";
-	private static final String GRANVILLE_ALMA_UBC = GRANVILLE + SLASH + ALMA + SLASH + UBC;
 	private static final String DUNBAR = "Dunbar";
 	private static final String ARBUTUS = "Arbutus";
 	private static final String SFU = "SFU";
 	private static final String EDMONDS_STN = "Edmonds Stn";
-	private static final String ANNACIS_ISL = "Annacis Isl";
-	private static final String MAPLE_MDWS_STN_MEADOWTOWN = MAPLE_MDWS_STN + SLASH + MEADOWTOWN;
 	private static final String _29TH_AVE_STN = "29th Ave Stn";
 	private static final String _15TH_ST = "15th St";
 	private static final String GUILDFORD = "Guildford";
+	private static final String SEYMOUR = "Seymour";
 	private static final String INGLEWOOD = "Inglewood";
+	private static final String RIVERPORT = "Riverport";
+	private static final String STEVESTON = "Steveston";
+
+	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
+	static {
+		HashMap<Long, RouteTripSpec> map2 = new HashMap<Long, RouteTripSpec>();
+		map2.put(214l, new RouteTripSpec(214l, //
+				0, MTrip.HEADSIGN_TYPE_STRING, BLUERIDGE, //
+				1, MTrip.HEADSIGN_TYPE_STRING, VANCOUVER) //
+				.addTripSort(0, //
+						Arrays.asList(new String[] { "4154", "4113", "4116", "4118", "4067", "4163", "11553", "409" })) //
+				.addTripSort(1, //
+						Arrays.asList(new String[] { "409", "4143", "4068", "4069", "4070", "4071", "4072", "4154" })) //
+				.compileBothTripSort());
+		map2.put(606l, new RouteTripSpec(606l, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "7572", "7582", "12126" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "12128", "7460", "7572" })) //
+				.compileBothTripSort());
+		map2.put(608l, new RouteTripSpec(608l, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "7602", "7478", "12130" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "12130", "7621", "7602" })) //
+				.compileBothTripSort());
+		map2.put(804l, new RouteTripSpec(804l, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "5743", "6003", "9452" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "5918", "5933", "4845" })) //
+				.compileBothTripSort());
+		map2.put(807l, new RouteTripSpec(807l, //
+				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
+				.addTripSort(MDirectionType.NORTH.intValue(), //
+						Arrays.asList(new String[] { "7259", "7260", "7317", "7318", "7319", "7322", "7347", "9593", "9591", "11805" })) //
+				.addTripSort(MDirectionType.SOUTH.intValue(), //
+						Arrays.asList(new String[] { "9592", "7317", "7322", "5352", "7259" })) //
+				.compileBothTripSort());
+		map2.put(828l, new RouteTripSpec(828l, //
+				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
+				.addTripSort(MDirectionType.NORTH.intValue(), //
+						Arrays.asList(new String[] { "5768", "5840", "5852" })) //
+				.addTripSort(MDirectionType.SOUTH.intValue(), //
+						Arrays.asList(new String[] { "5852", "5861", "5769" })) //
+				.compileBothTripSort());
+		map2.put(855l, new RouteTripSpec(855l, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "6425", "6153", "9062" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "6133", "8806", "9132" })) //
+				.compileBothTripSort());
+		map2.put(861l, new RouteTripSpec(861l, //
+				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
+				.addTripSort(MDirectionType.NORTH.intValue(), //
+						Arrays.asList(new String[] { "3810", "3814", "3057" })) //
+				.addTripSort(MDirectionType.SOUTH.intValue(), //
+						Arrays.asList(new String[] { "3776", "3732", "3810" })) //
+				.compileBothTripSort());
+		map2.put(867l, new RouteTripSpec(867l, //
+				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
+				.addTripSort(MDirectionType.NORTH.intValue(), //
+						Arrays.asList(new String[] { "11940", "3317", "9337" })) //
+				.addTripSort(MDirectionType.SOUTH.intValue(), //
+						Arrays.asList(new String[] { "9336", "9650", "3221", "9337", "3394" })) //
+				.compileBothTripSort());
+		map2.put(880l, new RouteTripSpec(880l, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "4473", "4070", "4144" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "4113", "4118", "4473" })) //
+				.compileBothTripSort());
+		map2.put(881l, new RouteTripSpec(881l, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "4439", "8018", "4224" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "8018", "4430", "4438" })) //
+				.compileBothTripSort());
+		map2.put(895l, new RouteTripSpec(895l, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "12084", "10935" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "10935", "12084" })) //
+				.compileBothTripSort());
+		ALL_ROUTE_TRIPS2 = map2;
+	}
+
+	@Override
+	public int compareEarly(long routeId, List<MTripStop> list1, List<MTripStop> list2, MTripStop ts1, MTripStop ts2, GStop ts1GStop, GStop ts2GStop) {
+		if (ALL_ROUTE_TRIPS2.containsKey(routeId)) {
+			return ALL_ROUTE_TRIPS2.get(routeId).compare(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop);
+		}
+		return super.compareEarly(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop);
+	}
+
+	@Override
+	public ArrayList<MTrip> splitTrip(MRoute mRoute, GTrip gTrip, GSpec gtfs) {
+		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
+			return ALL_ROUTE_TRIPS2.get(mRoute.getId()).getAllTrips();
+		}
+		return super.splitTrip(mRoute, gTrip, gtfs);
+	}
+
+	@Override
+	public Pair<Long[], Integer[]> splitTripStop(MRoute mRoute, GTrip gTrip, GTripStop gTripStop, ArrayList<MTrip> splitTrips, GSpec routeGTFS) {
+		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
+			return SplitUtils.splitTripStop(mRoute, gTrip, gTripStop, routeGTFS, ALL_ROUTE_TRIPS2.get(mRoute.getId()));
+		}
+		return super.splitTripStop(mRoute, gTrip, gTripStop, splitTrips, routeGTFS);
+	}
+
 	private static final String SPECIAL_ = "SPECIAL";
 
 	@Override
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
-		if (mRoute.id == 4l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(POWELL, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(UBC, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 6l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(DOWNTOWN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 7l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(DUNBAR, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 8l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(DOWNTOWN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 9l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(COMM_L_BDWAY_STN_BOUNDARY, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(GRANVILLE_ALMA_UBC, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 10l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(DOWNTOWN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(GRANVILLE, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 14l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(HASTINGS_DOWNTOWN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(UBC, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 16l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(_29TH_AVE_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(ARBUTUS, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 17l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(DOWNTOWN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 19l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(METROTOWN_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(STANLEY_PK, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 20l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(DOWNTOWN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(VICTORIA, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 22l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(KNIGHT, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(MACDONALD, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 25l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(BRENTWOOD_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(UBC, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 27l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(KOOTENAY_LOOP, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 28l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(PHIBBS_EXCH, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(JOYCE_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 41l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(JOYCE_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(CROWN_UBC, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 49l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(METROTOWN_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(UBC, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 99l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(COMM_L_BDWAY_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(UBC, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 104l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(ANNACIS_ISL, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 110l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(LOUGHEED_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(METROTOWN_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 112l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(EDMONDS_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 123l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(BRENTWOOD_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 130l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.NORTH);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.SOUTH);
-				return;
-			}
-		} else if (mRoute.id == 135l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(SFU, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 160l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(PORT_COQUITLAM_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(VANCOUVER, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 209l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(VANCOUVER, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 210l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(UPPER_LYNN_VLY, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(VANCOUVER, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 214l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(VANCOUVER + SLASH + PHIBBS_EXCH, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 227l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(PHIBBS_EXCH, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 228l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(LONSDALE_QUAY, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 230l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(UPPER_LONSDALE, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 232l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(GROUSE_MTN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 236l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(GROUSE_MTN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 239l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(CAPILANO_U, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(PK_ROYAL, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 240l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(_15TH_ST, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(VANCOUVER, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 242l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(UPPER_LONSDALE, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 246l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(LONSDALE_QUAY, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(VANCOUVER, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 247l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(UPPER_CAPILANO, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 250l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(VANCOUVER, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(HORSESHOE_BAY, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 252l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(INGLEWOOD, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 253l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(VANCOUVER_PK_ROYAL, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 254l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(BRITISH_PROPERTIES, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(VANCOUVER_PK_ROYAL, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 255l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(CAPILANO_U, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(DUNDARAVE, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 256l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(WHITBY_ESTS, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(SPURAWAY_PK_ROYAL, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 257l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(VANCOUVER, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(HORSESHOE_BAY, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 259l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(HORSESHOE_BAY, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 314l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(SUNBURY, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 320l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(LANGLEY_CTR, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 321l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(NEWTON_EXCH_WHITE_ROCK, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 323l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(NEWTON_EXCH, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 329l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 335l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(NEWTON_EXCH, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 341l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(GUILDFORD, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 351l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(CR_BEACH, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 401l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(GDN_CITY, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(ONE_RD, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 403l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(BRIDGEPORT_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 404l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(BRIGHOUSE_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(FOUR_RD, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 403l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(FIVE_RD, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 407l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(BRIDGEPORT_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(GILBERT, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 410l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(_22ND_ST_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(RAILWAY, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 501l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(LANGLEY_CTR, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 503l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 555l) {
+		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
+			return; // split
+		}
+		if (mRoute.getId() == 555l) {
 			if (gTrip.getDirectionId() == 0) {
 				mTrip.setHeadsignString(CARVOLTH_EXCH, gTrip.getDirectionId());
 				return;
@@ -652,236 +381,656 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(LOUGHEED_STN, gTrip.getDirectionId());
 				return;
 			}
-		} else if (mRoute.id == 601l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.NORTH);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.SOUTH);
+		} else if (mRoute.getId() == 848l) {
+			if (SPECIAL_.equalsIgnoreCase(gTrip.getTripHeadsign())) {
+				mTrip.setHeadsignString(LOUGHEED_STN, gTrip.getDirectionId());
 				return;
 			}
-		} else if (mRoute.id == 603l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(BRIDGEPORT_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 604l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(BRIDGEPORT_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 606l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.EAST);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.WEST);
-				return;
-			}
-		} else if (mRoute.id == 608l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.EAST);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.WEST);
-				return;
-			}
-		} else if (mRoute.id == 604l) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(LADNER_EXCH, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 701l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(MAPLE_RDG_EAST, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == 804l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.EAST);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.WEST);
-				return;
-			}
-		} else if (mRoute.id == 807l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.NORTH);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.SOUTH);
-				return;
-			}
-		} else if (mRoute.id == 828l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.NORTH);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.SOUTH);
-				return;
-			}
-		} else if (mRoute.id == 848l) {
+		} else if (mRoute.getId() == 863l) {
 			if (SPECIAL_.equalsIgnoreCase(gTrip.getTripHeadsign())) {
 				mTrip.setHeadsignDirection(MDirectionType.WEST);
 				return;
 			}
-			System.out.printf("\nUnexpected trip %s\n", gTrip);
-			System.exit(-1);
-			return;
-		} else if (mRoute.id == 855l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.EAST);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.WEST);
-				return;
-			}
-		} else if (mRoute.id == 861l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.NORTH);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.SOUTH);
-				return;
-			}
-		} else if (mRoute.id == 863l) {
+		} else if (mRoute.getId() == 865l) {
 			if (SPECIAL_.equalsIgnoreCase(gTrip.getTripHeadsign())) {
-				mTrip.setHeadsignDirection(MDirectionType.WEST);
-				return;
-			}
-			System.out.printf("\nUnexpected trip %s\n", gTrip);
-			System.exit(-1);
-			return;
-		} else if (mRoute.id == 865l) {
-			if (SPECIAL_.equalsIgnoreCase(gTrip.getTripHeadsign())) {
-				mTrip.setHeadsignDirection(MDirectionType.WEST);
-				return;
-			}
-			System.out.printf("\nUnexpected trip %s\n", gTrip);
-			System.exit(-1);
-			return;
-		} else if (mRoute.id == 867l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.NORTH);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.SOUTH);
-				return;
-			}
-		} else if (mRoute.id == 880l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.EAST);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.WEST);
-				return;
-			}
-		} else if (mRoute.id == 881l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.EAST);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.WEST);
-				return;
-			}
-		} else if (mRoute.id == 895l) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignDirection(MDirectionType.EAST);
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignDirection(MDirectionType.WEST);
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 12) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(LIONS_BAY, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 25) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(IOCO, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 26) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(BELCARRA, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(PT_MOODY_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 28) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(PT_MOODY_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 36) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(POCO_STN, gTrip.getDirectionId());
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(POCO_SOUTH, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 41) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(MAPLE_MDWS_STN_MEADOWTOWN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 43) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(MAPLE_MDWS_STN_MEADOWTOWN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 44) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(MAPLE_MDWS_STN_MEADOWTOWN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 45) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(HANEY_PL, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_C + 46) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(ALBION, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_N + 10) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(DOWNTOWN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_N + 19) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, gTrip.getDirectionId());
-				return;
-			}
-		} else if (mRoute.id == RID_SW_N + 24) {
-			if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(DOWNTOWN, gTrip.getDirectionId());
+				mTrip.setHeadsignString(HANEY_PLACE, mTrip.getHeadsignId());
 				return;
 			}
 		}
-		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.getTripHeadsign()), gTrip.getDirectionId());
+		String gTripHeadsign = gTrip.getTripHeadsign();
+		gTripHeadsign = STARTS_WITH_ROUTE.matcher(gTripHeadsign).replaceAll(StringUtils.EMPTY);
+		Matcher matcherTO = TO.matcher(gTripHeadsign);
+		if (matcherTO.find()) {
+			String gTripHeadsignBeforeTO = gTripHeadsign.substring(0, matcherTO.start());
+			String gTripHeadsignAfterTO = gTripHeadsign.substring(matcherTO.end());
+			if (mRoute.getLongName().equalsIgnoreCase(gTripHeadsignBeforeTO)) {
+				gTripHeadsign = gTripHeadsignAfterTO;
+			} else if (mRoute.getLongName().equalsIgnoreCase(gTripHeadsignAfterTO)) {
+				gTripHeadsign = gTripHeadsignBeforeTO;
+			} else {
+				gTripHeadsign = gTripHeadsignAfterTO;
+			}
+		}
+		Matcher matcherVIA = VIA.matcher(gTripHeadsign);
+		if (matcherVIA.find()) {
+			String gTripHeadsignBeforeVIA = gTripHeadsign.substring(0, matcherVIA.start());
+			String gTripHeadsignAfterVIA = gTripHeadsign.substring(matcherVIA.end());
+			if (mRoute.getLongName().equalsIgnoreCase(gTripHeadsignBeforeVIA)) {
+				gTripHeadsign = gTripHeadsignAfterVIA;
+			} else if (mRoute.getLongName().equalsIgnoreCase(gTripHeadsignAfterVIA)) {
+				gTripHeadsign = gTripHeadsignBeforeVIA;
+			} else {
+				gTripHeadsign = gTripHeadsignBeforeVIA;
+			}
+		}
+		mTrip.setHeadsignString(cleanTripHeadsign(gTripHeadsign), gTrip.getDirectionId());
 	}
+
+	@Override
+	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
+		if (mTrip.getRouteId() == 4l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(POWELL, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 6l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 7l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(DUNBAR, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 8l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 9l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BOUNDARY, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 10l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(GRANVILLE, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 14l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(HASTINGS, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 16l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(_29TH_AVE_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(ARBUTUS, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 17l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 19l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(METROTOWN_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(STANLEY_PK, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 20l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(VICTORIA, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 22l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(KNIGHT, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(MACDONALD, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 25l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BRENTWOOD_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 27l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(KOOTENAY_LOOP, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(JOYCE_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 28l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(CAPILANO_U, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(JOYCE_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 41l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(JOYCE_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 49l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(METROTOWN_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 99l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BOUNDARY, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 101l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(_22ND_ST_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 110l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(LOUGHEED_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(METROTOWN_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 112l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(EDMONDS_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 123l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(BRENTWOOD_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 128l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BRAID_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 130l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(CAPILANO_U, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(METROTOWN_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 134l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(LAKE_CITY_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(BRENTWOOD_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 135l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(SFU, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 136l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(LOUGHEED_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(BRENTWOOD_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 151l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(COQ_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 155l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(_22ND_ST_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 159l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(BRAID_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 160l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(POCO_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 209l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 210l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(UPPER_LYNN_VALLEY, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 211l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(SEYMOUR, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 214l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 228l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(LONSDALE_QUAY, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 230l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(UPPER_LONSDALE, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 236l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(GROUSE_MTN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 239l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(CAPILANO_U, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(PARK_ROYAL, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 240l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(_15TH_ST, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 242l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(UPPER_LONSDALE, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 246l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(LONSDALE_QUAY, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 247l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(GROUSE_MTN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 250l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(HORSESHOE_BAY, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 252l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(INGLEWOOD, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 253l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 254l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BRITISH_PROPERTIES, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 255l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(CAPILANO_U, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(DUNDARAVE, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 256l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(WHITBY_ESTATES, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(SPURAWAY, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 257l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(HORSESHOE_BAY, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 259l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(PARK_ROYAL, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 314l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(SUNBURY, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 320l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(LANGLEY_CTR, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 321l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(NEW_WEST_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(WHITE_ROCK, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 323l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(NEWTON_EXCH, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 329l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 335l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(NEWTON_EXCH, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 337l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 341l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(GUILDFORD, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 351l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(CRESCENT_BEACH, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(CRESCENT_BEACH, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 388l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(_22ND_ST_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 401l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(GARDEN_CITY, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 403l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 404l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(FOUR_RD, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(BRIGHOUSE_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 405l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(FIVE_RD, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 407l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(GILBERT, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 410l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(_22ND_ST_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(RAILWAY, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 501l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(LANGLEY_CTR, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 502l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BROOKSWOOD, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 503l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 555l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(CARVOLTH_EXCH, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(LOUGHEED_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 601l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(SOUTH_DELTA, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 603l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 604l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 640l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(LADNER_EXCH, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 701l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(MAPLE_RDG_EAST, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 848l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(LOUGHEED_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 863l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignDirection(MDirectionType.WEST);
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 865l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(HANEY_PLACE, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 12l) { // C12
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(LIONS_BAY, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 25l) { // C25
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BELCARRA, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 26l) { // C26
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(BELCARRA, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 28l) { // C28
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(PT_MOODY_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 36l) { // C36
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(POCO_SOUTH, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 37l) { // C37
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(RIVERSIDE, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(POCO_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 43l) { // C43
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(MEADOWTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 44l) { // C44
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(MEADOWTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 45l) { // C45
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(HANEY_PLACE, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 46l) { // C46
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(ALBION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 93l) { // C93
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(RIVERPORT, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(STEVESTON, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_N + 10l) { // N10
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_N + 19l) { // N19
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_N + 24l) { // N24
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		}
+		return super.mergeHeadsign(mTrip, mTripToMerge);
+	}
+
+	private static final Pattern TO = Pattern.compile("((^|\\W){1}(to)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern VIA = Pattern.compile("((^|\\W){1}(via)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern STARTS_WITH_QUOTE = Pattern.compile("(^\")", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern ENDS_WITH_QUOTE = Pattern.compile("(\"[;]?[\\s]?$)", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern ENDS_WITH_VIA = Pattern.compile("(via.*$)", Pattern.CASE_INSENSITIVE);
-
-	private static final Pattern STARTS_WITH_ROUTE = Pattern.compile("(^[0-9A-Z]{1,4}[\\s]{1})", Pattern.CASE_INSENSITIVE);
-
-	private static final Pattern TO = Pattern.compile("((^|\\s){1}(to)[\\s]+)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern STARTS_WITH_ROUTE = Pattern.compile("(^[A-Z]{0,1}[0-9]{1,3}[\\s]+{1})", Pattern.CASE_INSENSITIVE);
 
 	private static final String SPACE = " ";
 
 	private static final Pattern EXPRESS = Pattern.compile("((^|\\s){1}(\\- )?(express)( \\-)?(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern SPECIAL = Pattern.compile("((^|\\s){1}(\\- )?(special)( \\-)?(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern SPECIAL = Pattern.compile("((^|\\s){1}(\\- special|special \\-)?(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern ONLY = Pattern.compile("((^|\\s){1}(\\- )?(only)( \\-)?(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
@@ -892,8 +1041,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern ENDS_WITH_B_LINE = Pattern.compile("((^|\\s){1}(\\- b\\-line)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern UBC_LC = Pattern.compile("((^|\\s){1}(ubc)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
-	private static final String UBC_LC_REPLACEMENT = "$2" + UBC + "$4";
+	private static final Pattern U_B_C = Pattern.compile("((^|\\s){1}(ubc|u b c)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String U_B_C_REPLACEMENT = "$2" + UBC + "$4";
+
+	private static final Pattern S_F_U = Pattern.compile("((^|\\s){1}(sfu|s f u)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String S_F_U_REPLACEMENT = "$2" + SFU + "$4";
 
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
@@ -902,13 +1054,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = STARTS_WITH_QUOTE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = ENDS_WITH_QUOTE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = STARTS_WITH_ROUTE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
-		tripHeadsign = ENDS_WITH_VIA.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = ENDS_WITH_B_LINE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
-		tripHeadsign = TO.matcher(tripHeadsign).replaceAll(SPACE);
-		tripHeadsign = AND.matcher(tripHeadsign).replaceAll(AND_REPLACEMENT);
-		tripHeadsign = AT.matcher(tripHeadsign).replaceAll(AT_REPLACEMENT);
+		tripHeadsign = CleanUtils.CLEAN_AND.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
+		tripHeadsign = AT_LIKE.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
+		tripHeadsign = CleanUtils.CLEAN_AT.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
 		tripHeadsign = EXCHANGE.matcher(tripHeadsign).replaceAll(EXCHANGE_REPLACEMENT);
-		tripHeadsign = UBC_LC.matcher(tripHeadsign).replaceAll(UBC_LC_REPLACEMENT);
+		tripHeadsign = S_F_U.matcher(tripHeadsign).replaceAll(S_F_U_REPLACEMENT);
+		tripHeadsign = U_B_C.matcher(tripHeadsign).replaceAll(U_B_C_REPLACEMENT);
 		tripHeadsign = NIGHTBUS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = EXPRESS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = SPECIAL.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
@@ -918,27 +1070,34 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		return CleanUtils.cleanLabel(tripHeadsign);
 	}
 
-	private static final Pattern AND = Pattern.compile("( and )", Pattern.CASE_INSENSITIVE);
-	private static final String AND_REPLACEMENT = " & ";
+	private static final Pattern AT_LIKE = Pattern.compile("((^|\\W){1}(fs|ns)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern AT = Pattern.compile("([\\s]+(at|fs|ns)[\\s]+)", Pattern.CASE_INSENSITIVE);
-	private static final String AT_REPLACEMENT = SLASH;
+	private static final Pattern FLAG_STOP = Pattern.compile("((^flagstop)[\\s]*(.*$))", Pattern.CASE_INSENSITIVE);
+	private static final String FLAG_STOP_REPLACEMENT = "$3 ($2)";
 
-	private static final Pattern STARTS_WITH_BOUND = Pattern.compile("(^(eb|wb|sb|nb) )", Pattern.CASE_INSENSITIVE);
+	private static final Pattern BOUND = Pattern.compile("((^|\\W){1}(eb|wb|sb|nb)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern UNLOADING = Pattern.compile("(unloading( only)?$)", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern ENDS_WITH_DASHES = Pattern.compile("([\\-]+$)", Pattern.CASE_INSENSITIVE);
 
+	private static final Pattern STARTS_WITH_AT = Pattern.compile("(^@ )", Pattern.CASE_INSENSITIVE);
+
 	@Override
 	public String cleanStopName(String gStopName) {
 		gStopName = gStopName.toLowerCase(Locale.ENGLISH);
-		gStopName = STARTS_WITH_BOUND.matcher(gStopName).replaceAll(StringUtils.EMPTY);
-		gStopName = AT.matcher(gStopName).replaceAll(AT_REPLACEMENT);
-		gStopName = AND.matcher(gStopName).replaceAll(AND_REPLACEMENT);
+		gStopName = BOUND.matcher(gStopName).replaceAll(SPACE);
+		gStopName = CleanUtils.SAINT.matcher(gStopName).replaceAll(CleanUtils.SAINT_REPLACEMENT);
+		gStopName = AT_LIKE.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
+		gStopName = CleanUtils.CLEAN_AT.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
+		gStopName = CleanUtils.CLEAN_AND.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
+		gStopName = FLAG_STOP.matcher(gStopName).replaceAll(FLAG_STOP_REPLACEMENT);
 		gStopName = UNLOADING.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = ENDS_WITH_DASHES.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = EXCHANGE.matcher(gStopName).replaceAll(EXCHANGE_REPLACEMENT);
+		gStopName = S_F_U.matcher(gStopName).replaceAll(S_F_U_REPLACEMENT);
+		gStopName = U_B_C.matcher(gStopName).replaceAll(U_B_C_REPLACEMENT);
+		gStopName = STARTS_WITH_AT.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = CleanUtils.cleanStreetTypes(gStopName);
 		return CleanUtils.cleanLabel(gStopName);
 	}
