@@ -138,9 +138,15 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteLongName(GRoute gRoute) {
-		String gRouteLongName = gRoute.getRouteLongName();
+		return cleanRouteLongName(gRoute.getRouteLongName());
+	}
+
+	private String cleanRouteLongName(String gRouteLongName) {
 		gRouteLongName = gRouteLongName.toLowerCase(Locale.ENGLISH);
 		gRouteLongName = CleanUtils.cleanSlashes(gRouteLongName);
+		gRouteLongName = S_F_U.matcher(gRouteLongName).replaceAll(S_F_U_REPLACEMENT);
+		gRouteLongName = U_B_C.matcher(gRouteLongName).replaceAll(U_B_C_REPLACEMENT);
+		gRouteLongName = V_C_C.matcher(gRouteLongName).replaceAll(V_C_C_REPLACEMENT);
 		return CleanUtils.cleanLabel(gRouteLongName);
 	}
 
@@ -169,30 +175,40 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		return null; // use agency color
 	}
 
+	private static final String EXCHANGE_SHORT = "Exch"; // like in GTFS
+	private static final String UNIVERSITY_SHORT = "U";
+	private static final String PORT_SHORT = "Pt"; // like GTFS & real-time API
+	private static final String PORT_COQUITLAM_SHORT = "PoCo";
+	private static final String COQUITLAM_SHORT = "Coq";
 	private static final String ALBION = "Albion";
 	private static final String HANEY_PLACE = "Haney Pl";
+	private static final String STATION_SHORT = "Sta"; // see @CleanUtils
 	private static final String MEADOWTOWN = "Meadowtown";
-	private static final String POCO_STN = "Poco Stn";
-	private static final String POCO_SOUTH = "Poco South";
+	private static final String POCO_STATION = PORT_COQUITLAM_SHORT + " " + STATION_SHORT;
+	private static final String POCO_SOUTH = PORT_COQUITLAM_SHORT + " South";
 	private static final String BELCARRA = "Belcarra";
-	private static final String PT_MOODY_STN = "Pt Moody Stn";
+	private static final String PORT_MOODY_STATION = PORT_SHORT + " Moody " + STATION_SHORT;
 	private static final String LIONS_BAY = "Lions Bay";
 	private static final String MAPLE_RDG_EAST = "Maple Rdg East";
-	private static final String LADNER_EXCH = "Ladner Exch";
-	private static final String CARVOLTH_EXCH = "Carvolth Exch";
-	private static final String LOUGHEED_STN = "Lougheed Stn";
+	private static final String LADNER = "Ladner";
+	private static final String LADNER_EXCH = LADNER + " " + EXCHANGE_SHORT;
+	private static final String CARVOLTH = "Carvolth";
+	private static final String CARVOLTH_EXCH = CARVOLTH + " " + EXCHANGE_SHORT;
+	private static final String LOUGHEED_STATION = "Lougheed " + STATION_SHORT;
 	private static final String GILBERT = "Gilbert";
 	private static final String FIVE_RD = "Five Rd";
-	private static final String BRIGHOUSE_STN = "Brighouse Stn";
+	private static final String BRIGHOUSE_STATION = "Brighouse " + STATION_SHORT;
 	private static final String FOUR_RD = "Four Rd";
-	private static final String BRIDGEPORT_STN = "Bridgeport Stn";
+	private static final String BRIDGEPORT = "Bridgeport";
+	private static final String BRIDGEPORT_STATION = BRIDGEPORT + " " + STATION_SHORT;
 	private static final String RIVERSIDE = "Riverside";
 	private static final String CRESCENT_BEACH = "Cr Beach";
 	private static final String WHITBY_ESTATES = "Whitby Ests";
 	private static final String WHITE_ROCK = "White Rock";
-	private static final String NEW_WEST_STN = "New West Stn";
-	private static final String NEWTON_EXCH = "Newton Exch";
-	private static final String SURREY_CENTRAL_STN = "Surrey Ctrl Stn";
+	private static final String NEW_WEST_STATION = "New West " + STATION_SHORT;
+	private static final String NEWTON = "Newton";
+	private static final String NEWTON_EXCH = NEWTON + " " + EXCHANGE_SHORT;
+	private static final String SURREY_CENTRAL_STATION = "Surrey Ctrl " + STATION_SHORT;
 	private static final String LANGLEY_CTR = "Langley Ctr";
 	private static final String SOUTH_DELTA = "South Delta";
 	private static final String BROOKSWOOD = "Brookswood";
@@ -204,35 +220,36 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String UPPER_LONSDALE = "Upper Lonsdale";
 	private static final String LONSDALE_QUAY = "Lonsdale Quay";
 	private static final String UPPER_LYNN_VALLEY = "Upper Lynn Vly";
+	private static final String BLUERIDGE = "Blueridge";
 	private static final String VANCOUVER = "Vancouver";
 	private static final String HORSESHOE_BAY = "Horseshoe Bay";
-	private static final String CAPILANO_U = "Capilano U";
+	private static final String CAPILANO_U = "Capilano " + UNIVERSITY_SHORT;
 	private static final String PARK_ROYAL = "Pk Royal";
-	private static final String GARDEN_CITY = "Gdn City";
 	private static final String RAILWAY = "Railway";
-	private static final String _22ND_ST_STN = "22nd St Stn";
+	private static final String _22ND_ST_STATION = "22nd St " + STATION_SHORT;
 	private static final String DOWNTOWN = "Downtown";
 	private static final String HASTINGS = "Hastings";
 	private static final String POWELL = "Powell";
 	private static final String UBC = "UBC";
-	private static final String JOYCE_STN = "Joyce Stn";
+	private static final String JOYCE_STATION = "Joyce " + STATION_SHORT;
 	private static final String KOOTENAY_LOOP = "Kootenay Loop";
-	private static final String BRENTWOOD_STN = "Brentwood Stn";
-	private static final String BRAID_STN = "Braid Stn";
-	private static final String COQ_STN = "Coq Stn";
+	private static final String BRENTWOOD_STATION = "Brentwood " + STATION_SHORT;
+	private static final String BRAID_STATION = "Braid " + STATION_SHORT;
+	private static final String COQ_STATION = COQUITLAM_SHORT + " " + STATION_SHORT;
 	private static final String MACDONALD = "Macdonald";
 	private static final String KNIGHT = "Knight";
 	private static final String VICTORIA = "Victoria";
-	private static final String LAKE_CITY_STN = "Lk City Stn";
-	private static final String METROTOWN_STN = "Metrotown Stn";
-	private static final String STANLEY_PK = "Stanley Pk";
+	private static final String LAKE_CITY_STATION = "Lk City " + STATION_SHORT;
+	private static final String METROTOWN_STATION = "Metrotown " + STATION_SHORT;
+	private static final String STANLEY_PARK = "Stanley Pk";
 	private static final String BOUNDARY = "Boundary";
 	private static final String GRANVILLE = "Granville";
 	private static final String DUNBAR = "Dunbar";
 	private static final String ARBUTUS = "Arbutus";
 	private static final String SFU = "SFU";
-	private static final String EDMONDS_STN = "Edmonds Stn";
-	private static final String _29TH_AVE_STN = "29th Ave Stn";
+	private static final String VCC = "VCC";
+	private static final String EDMONDS_STATION = "Edmonds " + STATION_SHORT;
+	private static final String _29TH_AVE_STATION = "29th Ave " + STATION_SHORT;
 	private static final String _15TH_ST = "15th St";
 	private static final String GUILDFORD = "Guildford";
 	private static final String SEYMOUR = "Seymour";
@@ -373,17 +390,27 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return; // split
 		}
-		if (mRoute.getId() == 555l) {
+		if (mRoute.getId() == 96l) {
+			if (gTrip.getTripHeadsign().toLowerCase(Locale.ENGLISH).contains("guildford")) {
+				if (gTrip.getDirectionId() == 0) {
+					mTrip.setHeadsignString(GUILDFORD, gTrip.getDirectionId());
+					return;
+				}
+				System.out.printf("\nUnexpected route trip head sign for %s!\n", gTrip);
+				System.exit(-1);
+				return;
+			}
+		} else if (mRoute.getId() == 555l) {
 			if (gTrip.getDirectionId() == 0) {
 				mTrip.setHeadsignString(CARVOLTH_EXCH, gTrip.getDirectionId());
 				return;
 			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString(LOUGHEED_STN, gTrip.getDirectionId());
+				mTrip.setHeadsignString(LOUGHEED_STATION, gTrip.getDirectionId());
 				return;
 			}
 		} else if (mRoute.getId() == 848l) {
 			if (SPECIAL_.equalsIgnoreCase(gTrip.getTripHeadsign())) {
-				mTrip.setHeadsignString(LOUGHEED_STN, gTrip.getDirectionId());
+				mTrip.setHeadsignString(LOUGHEED_STATION, gTrip.getDirectionId());
 				return;
 			}
 		} else if (mRoute.getId() == 863l) {
@@ -477,7 +504,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 16l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(_29TH_AVE_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(_29TH_AVE_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(ARBUTUS, mTrip.getHeadsignId());
@@ -490,10 +517,10 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 19l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(METROTOWN_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(METROTOWN_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(STANLEY_PK, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(STANLEY_PARK, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 20l) {
@@ -514,7 +541,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 25l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(BRENTWOOD_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRENTWOOD_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
@@ -525,7 +552,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(KOOTENAY_LOOP, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(JOYCE_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(JOYCE_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 28l) {
@@ -533,12 +560,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(CAPILANO_U, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(JOYCE_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(JOYCE_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 41l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(JOYCE_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(JOYCE_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
@@ -546,7 +573,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 49l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(METROTOWN_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(METROTOWN_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
@@ -562,30 +589,30 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 101l) {
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(_22ND_ST_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(_22ND_ST_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 110l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(LOUGHEED_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(LOUGHEED_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(METROTOWN_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(METROTOWN_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 112l) {
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(EDMONDS_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(EDMONDS_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 123l) {
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(BRENTWOOD_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRENTWOOD_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 128l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(BRAID_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRAID_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 130l) {
@@ -593,15 +620,15 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(CAPILANO_U, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(METROTOWN_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(METROTOWN_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 134l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(LAKE_CITY_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(LAKE_CITY_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(BRENTWOOD_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRENTWOOD_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 135l) {
@@ -611,30 +638,30 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 136l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(LOUGHEED_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(LOUGHEED_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(BRENTWOOD_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRENTWOOD_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 151l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(COQ_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(COQ_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 155l) {
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(_22ND_ST_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(_22ND_ST_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 159l) {
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(BRAID_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRAID_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 160l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(POCO_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(POCO_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
@@ -772,7 +799,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 314l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(SUNBURY, mTrip.getHeadsignId());
@@ -783,12 +810,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(LANGLEY_CTR, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 321l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(NEW_WEST_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(NEW_WEST_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(WHITE_ROCK, mTrip.getHeadsignId());
@@ -801,7 +828,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 329l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 335l) {
@@ -811,7 +838,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 337l) {
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 341l) {
@@ -829,17 +856,17 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 388l) {
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(_22ND_ST_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(_22ND_ST_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 401l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(GARDEN_CITY, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(RIVERPORT, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 403l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRIDGEPORT_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 404l) {
@@ -847,7 +874,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(FOUR_RD, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(BRIGHOUSE_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRIGHOUSE_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 405l) {
@@ -857,7 +884,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 407l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRIDGEPORT, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(GILBERT, mTrip.getHeadsignId());
@@ -865,7 +892,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 410l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(_22ND_ST_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(_22ND_ST_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(RAILWAY, mTrip.getHeadsignId());
@@ -883,7 +910,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 503l) {
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 555l) {
@@ -891,12 +918,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(CARVOLTH_EXCH, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(LOUGHEED_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(LOUGHEED_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 601l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRIDGEPORT_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(SOUTH_DELTA, mTrip.getHeadsignId());
@@ -904,12 +931,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 603l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRIDGEPORT_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 604l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(BRIDGEPORT_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(BRIDGEPORT_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 640l) {
@@ -924,7 +951,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 848l) {
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(LOUGHEED_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(LOUGHEED_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 863l) {
@@ -954,7 +981,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == RID_SW_C + 28l) { // C28
 			if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(PT_MOODY_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(PORT_MOODY_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == RID_SW_C + 36l) { // C36
@@ -967,7 +994,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(RIVERSIDE, mTrip.getHeadsignId());
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
-				mTrip.setHeadsignString(POCO_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(POCO_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == RID_SW_C + 43l) { // C43
@@ -1005,7 +1032,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == RID_SW_N + 19l) { // N19
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(SURREY_CENTRAL_STN, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == RID_SW_N + 24l) { // N24
@@ -1028,24 +1055,44 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final String SPACE = " ";
 
-	private static final Pattern EXPRESS = Pattern.compile("((^|\\s){1}(\\- )?(express)( \\-)?(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern EXPRESS = Pattern.compile("(\\-?( express|express )\\-?)", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern SPECIAL = Pattern.compile("((^|\\s){1}(\\- special|special \\-)?(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern SPECIAL = Pattern.compile("(\\-?( special|special )\\-?)", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern ONLY = Pattern.compile("((^|\\s){1}(\\- )?(only)( \\-)?(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern ONLY = Pattern.compile("(\\-?( only|only )\\-?)", Pattern.CASE_INSENSITIVE);
+
+	private static final Pattern UNIVERSITY = Pattern.compile("((^|\\W){1}(university)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String UNIVERSITY_REPLACEMENT = "$2" + UNIVERSITY_SHORT + "$4";
+
+	private static final Pattern PORT_COQUITLAM = Pattern.compile("((^|\\W){1}(port coquitlam|pt coquitlam|poco)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String PORT_COQUITLAM_REPLACEMENT = "$2" + PORT_COQUITLAM_SHORT + "$4";
+
+	private static final Pattern COQUITLAM = Pattern.compile("((^|\\W){1}(coquitlam|coq)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String COQUITLAM_REPLACEMENT = "$2" + COQUITLAM_SHORT + "$4";
+
+	private static final Pattern STATION = Pattern.compile("((^|\\W){1}(stn|sta|station)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String STATION_REPLACEMENT = "$2" + STATION_SHORT + "$4";
+
+	private static final Pattern PORT = Pattern.compile("((^|\\W){1}(port)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String PORT_REPLACEMENT = "$2" + PORT_SHORT + "$4";
 
 	private static final Pattern NIGHTBUS = Pattern.compile("((^|\\s){1}(nightbus)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern EXCHANGE = Pattern.compile("((^|\\s){1}(exchange)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
-	private static final String EXCHANGE_REPLACEMENT = "$2Exch$4"; // like in GTFS
+	private static final Pattern EXCHANGE = Pattern.compile("((^|\\s){1}(exchange|exch)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String EXCHANGE_REPLACEMENT = "$2" + EXCHANGE_SHORT + "$4";
 
-	private static final Pattern ENDS_WITH_B_LINE = Pattern.compile("((^|\\s){1}(\\- b\\-line)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern ENDS_WITH_B_LINE = Pattern.compile("((^|\\s){1}(\\- )?(b\\-line)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern U_B_C = Pattern.compile("((^|\\s){1}(ubc|u b c)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern U_B_C = Pattern.compile("((^|\\W){1}(ubc|u b c)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 	private static final String U_B_C_REPLACEMENT = "$2" + UBC + "$4";
 
-	private static final Pattern S_F_U = Pattern.compile("((^|\\s){1}(sfu|s f u)(\\s|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern S_F_U = Pattern.compile("((^|\\W){1}(sfu|s f u)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 	private static final String S_F_U_REPLACEMENT = "$2" + SFU + "$4";
+
+	private static final Pattern V_C_C = Pattern.compile("((^|\\W){1}(vcc|v c c)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String V_C_C_REPLACEMENT = "$2" + VCC + "$4";
+
+	private static final Pattern REMOVE_DASH = Pattern.compile("(^(\\s)*\\-(\\s)*|(\\s)*\\-(\\s)*$)", Pattern.CASE_INSENSITIVE);
 
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
@@ -1056,15 +1103,23 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = STARTS_WITH_ROUTE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = ENDS_WITH_B_LINE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = CleanUtils.CLEAN_AND.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
-		tripHeadsign = AT_LIKE.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
 		tripHeadsign = CleanUtils.CLEAN_AT.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
+		tripHeadsign = AT_LIKE.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
 		tripHeadsign = EXCHANGE.matcher(tripHeadsign).replaceAll(EXCHANGE_REPLACEMENT);
 		tripHeadsign = S_F_U.matcher(tripHeadsign).replaceAll(S_F_U_REPLACEMENT);
 		tripHeadsign = U_B_C.matcher(tripHeadsign).replaceAll(U_B_C_REPLACEMENT);
+		tripHeadsign = V_C_C.matcher(tripHeadsign).replaceAll(V_C_C_REPLACEMENT);
+		tripHeadsign = UNIVERSITY.matcher(tripHeadsign).replaceAll(UNIVERSITY_REPLACEMENT);
+		tripHeadsign = PORT_COQUITLAM.matcher(tripHeadsign).replaceAll(PORT_COQUITLAM_REPLACEMENT);
+		tripHeadsign = COQUITLAM.matcher(tripHeadsign).replaceAll(COQUITLAM_REPLACEMENT);
+		tripHeadsign = STATION.matcher(tripHeadsign).replaceAll(STATION_REPLACEMENT);
+		tripHeadsign = PORT.matcher(tripHeadsign).replaceAll(PORT_REPLACEMENT);
 		tripHeadsign = NIGHTBUS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = EXPRESS.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = SPECIAL.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = ONLY.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
+		tripHeadsign = REMOVE_DASH.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
+		tripHeadsign = CleanUtils.removePoints(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanNumbers(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanStreetTypes(tripHeadsign);
 		return CleanUtils.cleanLabel(tripHeadsign);
@@ -1086,6 +1141,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public String cleanStopName(String gStopName) {
 		gStopName = gStopName.toLowerCase(Locale.ENGLISH);
+		gStopName = CleanUtils.cleanSlashes(gStopName);
 		gStopName = BOUND.matcher(gStopName).replaceAll(SPACE);
 		gStopName = CleanUtils.SAINT.matcher(gStopName).replaceAll(CleanUtils.SAINT_REPLACEMENT);
 		gStopName = AT_LIKE.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
@@ -1095,8 +1151,10 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		gStopName = UNLOADING.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = ENDS_WITH_DASHES.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = EXCHANGE.matcher(gStopName).replaceAll(EXCHANGE_REPLACEMENT);
+		gStopName = STATION.matcher(gStopName).replaceAll(STATION_REPLACEMENT);
 		gStopName = S_F_U.matcher(gStopName).replaceAll(S_F_U_REPLACEMENT);
 		gStopName = U_B_C.matcher(gStopName).replaceAll(U_B_C_REPLACEMENT);
+		gStopName = V_C_C.matcher(gStopName).replaceAll(V_C_C_REPLACEMENT);
 		gStopName = STARTS_WITH_AT.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = CleanUtils.cleanStreetTypes(gStopName);
 		return CleanUtils.cleanLabel(gStopName);
