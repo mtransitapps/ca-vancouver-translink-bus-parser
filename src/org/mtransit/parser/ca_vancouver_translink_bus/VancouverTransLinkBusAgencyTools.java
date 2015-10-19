@@ -272,17 +272,17 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "7572", "7582", "12126" })) //
+						Arrays.asList(new String[] { "7572", "7582", "7591" /* "12126" */})) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "12128", "7460", "7572" })) //
+						Arrays.asList(new String[] { /* "12128" */"7591", "7460", "7572" })) //
 				.compileBothTripSort());
 		map2.put(608l, new RouteTripSpec(608l, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "7602", "7478", "12130" })) //
+						Arrays.asList(new String[] { "7602", "7478", "7591" /* "12130" */})) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "12130", "7621", "7602" })) //
+						Arrays.asList(new String[] { /* "12130" */"7591", "7621", "7602" })) //
 				.compileBothTripSort());
 		map2.put(804l, new RouteTripSpec(804l, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
