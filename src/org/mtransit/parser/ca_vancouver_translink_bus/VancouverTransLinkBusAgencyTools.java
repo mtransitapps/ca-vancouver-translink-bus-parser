@@ -703,6 +703,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(UPPER_LONSDALE, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 232l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(GROUSE_MTN, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 236l) {
 			if (mTrip.getHeadsignId() == 0) {
 				mTrip.setHeadsignString(GROUSE_MTN, mTrip.getHeadsignId());
