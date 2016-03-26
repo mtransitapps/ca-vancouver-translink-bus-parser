@@ -356,6 +356,16 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList(new String[] { "10935", "12084" })) //
 				.compileBothTripSort());
+		map2.put(RID_SW_C + 19l, new RouteTripSpec(RID_SW_C + 19l, // C19
+				0, MTrip.HEADSIGN_TYPE_STRING, "Alma", //
+				1, MTrip.HEADSIGN_TYPE_STRING, "Spanish Banks") //
+				// MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
+				// MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
+				.addTripSort(0, //
+						Arrays.asList(new String[] { "11002", "355", "674" })) //
+				.addTripSort(1, //
+						Arrays.asList(new String[] { "674", "599", "11002" })) //
+				.compileBothTripSort());
 		ALL_ROUTE_TRIPS2 = map2;
 	}
 
@@ -455,7 +465,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
-		if (mTrip.getRouteId() == 4l) {
+		if (mTrip.getRouteId() == 3l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString("Main-Marine Dr Sta", mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 4l) {
 			if (mTrip.getHeadsignId() == 0) {
 				mTrip.setHeadsignString(POWELL, mTrip.getHeadsignId());
 				return true;
@@ -969,6 +984,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(HANEY_PLACE, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 3l) { // C3
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString("Quayside", mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == RID_SW_C + 12l) { // C12
 			if (mTrip.getHeadsignId() == 0) {
 				mTrip.setHeadsignString(LIONS_BAY, mTrip.getHeadsignId());
@@ -1002,6 +1022,17 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(POCO_STATION, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 38l) { // C38
+			if (mTrip.getHeadsignId() == 0) {
+				return super.mergeHeadsign(mTrip, mTripToMerge);
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(COQ_STATION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 41l) { // C41
+			if (mTrip.getHeadsignId() == 0) {
+				return super.mergeHeadsign(mTrip, mTripToMerge);
+			}
 		} else if (mTrip.getRouteId() == RID_SW_C + 43l) { // C43
 			if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(MEADOWTOWN, mTrip.getHeadsignId());
@@ -1020,6 +1051,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == RID_SW_C + 46l) { // C46
 			if (mTrip.getHeadsignId() == 0) {
 				mTrip.setHeadsignString(ALBION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 76l) { // C76
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString("Scottsdale Exch", mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == RID_SW_C + 93l) { // C93
@@ -1046,7 +1082,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			}
 		}
-		return super.mergeHeadsign(mTrip, mTripToMerge);
+		System.out.printf("\nUnexpected tripts to merge %s & %s!\n", mTrip, mTripToMerge);
+		System.exit(-1);
+		return false;
 	}
 
 	private static final Pattern TO = Pattern.compile("((^|\\W){1}(to)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
