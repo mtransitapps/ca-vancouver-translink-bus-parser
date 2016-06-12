@@ -465,7 +465,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
-		if (mTrip.getRouteId() == 3l) {
+		if (mTrip.getRouteId() == 2l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(MACDONALD, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 3l) {
 			if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString("Main-Marine Dr Sta", mTrip.getHeadsignId());
 				return true;
@@ -706,6 +711,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == 214l) {
 			if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 227l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString("Phibbs Exch", mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 228l) {
@@ -1002,6 +1012,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == RID_SW_C + 26l) { // C26
 			if (mTrip.getHeadsignId() == 0) {
 				mTrip.setHeadsignString(BELCARRA, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(PORT_MOODY_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == RID_SW_C + 28l) { // C28
