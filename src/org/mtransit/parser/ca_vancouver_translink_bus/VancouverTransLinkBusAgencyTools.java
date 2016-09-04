@@ -466,7 +466,10 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
 		if (mTrip.getRouteId() == 2l) {
-			if (mTrip.getHeadsignId() == 1) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(MACDONALD, mTrip.getHeadsignId());
 				return true;
 			}
@@ -605,6 +608,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 100l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(_22ND_ST_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 101l) {
@@ -928,6 +936,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(RAILWAY, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 430l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(BRIGHOUSE_STATION, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 501l) {
 			if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(LANGLEY_CTR, mTrip.getHeadsignId());
@@ -941,6 +954,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == 503l) {
 			if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 531l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString("Willowbrook", mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 555l) {
@@ -1077,6 +1095,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(STEVESTON, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 98l) { // C98
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(_22ND_ST_STATION, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString("Kingswood", mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == RID_SW_N + 10l) { // N10
