@@ -73,7 +73,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		return super.excludeCalendarDate(gCalendarDates);
 	}
 
-	private static final List<String> EXCLUDE_RSN = Arrays.asList(new String[] { "980", "996", "997", "998", "999" });
+	private static final List<String> EXCLUDE_RSN = Arrays.asList(new String[] { //
+			"980", // CANADA LINE SKYTRAIN
+					"991", // MILLENNIUM SKYTRAIN
+					"992", // EXPO SKYTRAIN
+					"997", // WEST COAST EXPRESS
+					"998", // SEABUS
+			});
 
 	@Override
 	public boolean excludeRoute(GRoute gRoute) {
@@ -562,6 +568,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(MACDONALD, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 23l) {
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString("Beach", mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 25l) {
 			if (mTrip.getHeadsignId() == 0) {
 				mTrip.setHeadsignString(BRENTWOOD_STATION, mTrip.getHeadsignId());
@@ -600,6 +611,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 95l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString("SFU", mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 99l) {
@@ -693,6 +709,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 181l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString("Belcarra", mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 209l) {
@@ -1103,6 +1124,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString("Kingswood", mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_N + 9l) { // N9
+			if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == RID_SW_N + 10l) { // N10
