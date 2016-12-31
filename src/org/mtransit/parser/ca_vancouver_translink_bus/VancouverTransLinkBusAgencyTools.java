@@ -189,6 +189,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String ALBION = "Albion";
 	private static final String HANEY_PLACE = "Haney Pl";
 	private static final String STATION_SHORT = "Sta"; // see @CleanUtils
+	private static final String CENTRAL_SHORT = "Ctrl";
 	private static final String MEADOWTOWN = "Meadowtown";
 	private static final String POCO_STATION = PORT_COQUITLAM_SHORT + " " + STATION_SHORT;
 	private static final String POCO_SOUTH = PORT_COQUITLAM_SHORT + " South";
@@ -214,7 +215,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String NEW_WEST_STATION = "New West " + STATION_SHORT;
 	private static final String NEWTON = "Newton";
 	private static final String NEWTON_EXCH = NEWTON + " " + EXCHANGE_SHORT;
-	private static final String SURREY_CENTRAL_STATION = "Surrey Ctrl " + STATION_SHORT;
+	private static final String SURREY_CENTRAL_STATION = "Surrey " + CENTRAL_SHORT + " " + STATION_SHORT;
 	private static final String LANGLEY_CTR = "Langley Ctr";
 	private static final String SOUTH_DELTA = "South Delta";
 	private static final String BROOKSWOOD = "Brookswood";
@@ -1200,6 +1201,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final Pattern V_C_C = Pattern.compile("((^|\\W){1}(vcc|v c c)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 	private static final String V_C_C_REPLACEMENT = "$2" + VCC + "$4";
 
+	private static final Pattern CENTRAL = Pattern.compile("((^|\\W){1}(central)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String CENTER_REPLACEMENT = "$2" + CENTRAL_SHORT + "$4";
+
 	private static final Pattern REMOVE_DASH = Pattern.compile("(^(\\s)*\\-(\\s)*|(\\s)*\\-(\\s)*$)", Pattern.CASE_INSENSITIVE);
 
 	@Override
@@ -1213,6 +1217,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = CleanUtils.CLEAN_AND.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
 		tripHeadsign = CleanUtils.CLEAN_AT.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
 		tripHeadsign = AT_LIKE.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
+		tripHeadsign = CENTRAL.matcher(tripHeadsign).replaceAll(CENTER_REPLACEMENT);
 		tripHeadsign = EXCHANGE.matcher(tripHeadsign).replaceAll(EXCHANGE_REPLACEMENT);
 		tripHeadsign = S_F_U.matcher(tripHeadsign).replaceAll(S_F_U_REPLACEMENT);
 		tripHeadsign = U_B_C.matcher(tripHeadsign).replaceAll(U_B_C_REPLACEMENT);
@@ -1263,6 +1268,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		gStopName = S_F_U.matcher(gStopName).replaceAll(S_F_U_REPLACEMENT);
 		gStopName = U_B_C.matcher(gStopName).replaceAll(U_B_C_REPLACEMENT);
 		gStopName = V_C_C.matcher(gStopName).replaceAll(V_C_C_REPLACEMENT);
+		gStopName = CENTRAL.matcher(gStopName).replaceAll(CENTER_REPLACEMENT);
 		gStopName = STARTS_WITH_AT.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		gStopName = CleanUtils.cleanStreetTypes(gStopName);
 		return CleanUtils.cleanLabel(gStopName);
