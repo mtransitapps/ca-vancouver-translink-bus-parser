@@ -712,6 +712,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 172l) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString(RIVERSIDE, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 181l) {
 			if (mTrip.getHeadsignId() == 0) {
 				mTrip.setHeadsignString("Belcarra", mTrip.getHeadsignId());
