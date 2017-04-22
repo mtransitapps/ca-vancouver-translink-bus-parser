@@ -196,7 +196,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String BELCARRA = "Belcarra";
 	private static final String PORT_MOODY_STATION = PORT_SHORT + " Moody " + STATION_SHORT;
 	private static final String LIONS_BAY = "Lions Bay";
-	private static final String MAPLE_RDG_EAST = "Maple Rdg East";
+	private static final String MAPLE_RIDGE_EAST = "Maple Rdg East";
 	private static final String LADNER = "Ladner";
 	private static final String LADNER_EXCH = LADNER + " " + EXCHANGE_SHORT;
 	private static final String CARVOLTH = "Carvolth";
@@ -983,6 +983,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 509L) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString("Walnut Grv", mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 531l) {
 			if (mTrip.getHeadsignId() == 0) {
 				mTrip.setHeadsignString("Willowbrook", mTrip.getHeadsignId());
@@ -1021,7 +1026,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 701l) {
 			if (mTrip.getHeadsignId() == 0) {
-				mTrip.setHeadsignString(MAPLE_RDG_EAST, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(MAPLE_RIDGE_EAST, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 848l) {
@@ -1040,7 +1045,10 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			}
 		} else if (mTrip.getRouteId() == RID_SW_C + 3l) { // C3
-			if (mTrip.getHeadsignId() == 1) {
+			if (mTrip.getHeadsignId() == 0) {
+				mTrip.setHeadsignString("Victoria Hl", mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
 				mTrip.setHeadsignString("Quayside", mTrip.getHeadsignId());
 				return true;
 			}
