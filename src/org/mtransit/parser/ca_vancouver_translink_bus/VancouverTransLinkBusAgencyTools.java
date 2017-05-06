@@ -263,6 +263,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String INGLEWOOD = "Inglewood";
 	private static final String RIVERPORT = "Riverport";
 	private static final String STEVESTON = "Steveston";
+	private static final String BURQUITLAM_STATION = "Burquitlam " + STATION_SHORT;
 
 	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
 	static {
@@ -692,6 +693,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == 151l) {
 			if (mTrip.getHeadsignId() == 0) {
 				mTrip.setHeadsignString(COQ_STATION, mTrip.getHeadsignId());
+				return true;
+			} else if (mTrip.getHeadsignId() == 1) {
+				mTrip.setHeadsignString(BURQUITLAM_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 155l) {
