@@ -364,6 +364,26 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(1, //
 						Arrays.asList(new String[] { "409", "4143", "4068", "4069", "4070", "4071", "4072", "4154" })) //
 				.compileBothTripSort());
+		map2.put(227L, new RouteTripSpec(227L, //
+				0, MTrip.HEADSIGN_TYPE_STRING, LYNN_VALLEY + SPACE + CENTER_SHORT, //
+				1, MTrip.HEADSIGN_TYPE_STRING, PHIBBS_EXCHANGE) //
+				.addTripSort(0, //
+						Arrays.asList(new String[] { //
+						"4119", // PHIBBS EXCHANGE BAY 7
+								"10879", // ==
+								"4263", // <> SB DUVAL RD FS DRAYCOTT RD
+								"4045", // ==
+								"10882", // EB LYNN VALLEY NS MOUNTAIN HWY
+						})) //
+				.addTripSort(1, //
+						Arrays.asList(new String[] { //
+						"10882", // EB LYNN VALLEY NS MOUNTAIN HWY
+								"4262", // !=
+								"4263", // <> SB DUVAL RD FS DRAYCOTT
+								"4264", // !=
+								"1761", // PHIBBS EXCHANGE BAY 5
+						})) //
+				.compileBothTripSort());
 		map2.put(555L, new RouteTripSpec(555L, //
 				0, MTrip.HEADSIGN_TYPE_STRING, CARVOLTH_EXCH, //
 				1, MTrip.HEADSIGN_TYPE_STRING, LOUGHEED_STATION) //
@@ -686,6 +706,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(_29TH_AVE_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (Arrays.asList( //
+					"Pne", //
 					HASTINGS, //
 					ARBUTUS //
 					).containsAll(headsignsValues)) {
@@ -703,6 +724,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 19l) {
 			if (Arrays.asList( //
+					DOWNTOWN, //
 					GRANVILLE, //
 					METROTOWN_STATION //
 					).containsAll(headsignsValues)) {
@@ -869,6 +891,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			if (Arrays.asList( //
 					HASTINGS, //
 					KOOTENAY_LOOP, //
+					"Pender", //
 					PHIBBS_EXCHANGE //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(PHIBBS_EXCHANGE, mTrip.getHeadsignId());
@@ -948,6 +971,22 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(BELCARRA, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 186l) {
+			if (Arrays.asList( //
+					"Panorama", //
+					"Hampton Pk" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Hampton Pk", mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 187l) {
+			if (Arrays.asList( //
+					"Panorama", //
+					"Pkwy" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Pkwy", mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 209l) {
 			if (Arrays.asList( //
 					PHIBBS_EXCHANGE, //
@@ -964,6 +1003,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(UPPER_LYNN_VALLEY, mTrip.getHeadsignId());
 				return true;
 			} else if (Arrays.asList( //
+					"Pne", //
 					PHIBBS_EXCHANGE, //
 					VANCOUVER //
 					).containsAll(headsignsValues)) {
@@ -982,6 +1022,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					VANCOUVER //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 227L) {
+			if (Arrays.asList( //
+					PHIBBS_EXCHANGE //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(PHIBBS_EXCHANGE, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 228l) {
