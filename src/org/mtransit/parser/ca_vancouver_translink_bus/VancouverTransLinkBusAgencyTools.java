@@ -1282,6 +1282,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(NEWTON_EXCH, mTrip.getHeadsignId());
 				return true;
+			} else if (Arrays.asList( //
+					GUILDFORD, //
+					SURREY_CENTRAL_STATION //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
+				return true;
 			}
 		} else if (mTrip.getRouteId() == 337l) {
 			if (Arrays.asList( //
