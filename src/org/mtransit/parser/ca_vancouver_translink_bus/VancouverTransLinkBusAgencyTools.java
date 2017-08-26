@@ -598,6 +598,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
+		List<String> headsignsValues = Arrays.asList(mTrip.getHeadsignValue(), mTripToMerge.getHeadsignValue());
 		if (mTrip.getRouteId() == 2l) {
 			if (Arrays.asList( //
 					BURRARD_STATION, //
@@ -662,7 +663,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			} else if (Arrays.asList( //
 					ALMA, //
 					GRANVILLE, //
-					OAK //
+					OAK, //
+					UBC //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(ALMA, mTrip.getHeadsignId());
 				return true;
@@ -787,6 +789,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 28l) {
 			if (Arrays.asList( //
+					CAPILANO_U, //
 					KOOTENAY_LOOP, //
 					PHIBBS_EXCHANGE //
 					).containsAll(headsignsValues)) {
@@ -889,6 +892,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 130l) {
 			if (Arrays.asList( //
+					CAPILANO_U, //
 					HASTINGS, //
 					KOOTENAY_LOOP, //
 					"Pender", //
@@ -950,6 +954,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == 159l) {
 			if (Arrays.asList( //
 					SPECIAL, //
+					"Brad Sta", //
 					BRAID_STATION //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(BRAID_STATION, mTrip.getHeadsignId());
@@ -1399,6 +1404,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
 				return true;
+			} else if (Arrays.asList( //
+					SPECIAL, //
+					"Aldergrove" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Aldergrove", mTrip.getHeadsignId());
+				return true;
 			}
 		} else if (mTrip.getRouteId() == 509L) {
 			if (Arrays.asList( //
@@ -1479,6 +1490,28 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					MAPLE_RIDGE_EAST //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(MAPLE_RIDGE_EAST, mTrip.getHeadsignId());
+				return true;
+			} else if (Arrays.asList( //
+					COQUITLAM_CENTRAL_STATION, //
+					HANEY_PLACE //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(COQUITLAM_CENTRAL_STATION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 733l) {
+			if (Arrays.asList( //
+					HANEY_PLACE, //
+					PT_HANEY_STATION //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(PT_HANEY_STATION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 741l) {
+			if (Arrays.asList( //
+					HANEY_PLACE, //
+					PT_HANEY_STATION //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(PT_HANEY_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == RID_SW_C + 3l) { // C3
@@ -1624,6 +1657,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			}
 		}
+		if (isGoodEnoughAccepted()) {
+			return super.mergeHeadsign(mTrip, mTripToMerge);
+		}
 		System.out.printf("\nUnexpected tripts to merge %s & %s!\n", mTrip, mTripToMerge);
 		System.exit(-1);
 		return false;
@@ -1681,6 +1717,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final Pattern CENTRAL = Pattern.compile("((^|\\W){1}(central)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 	private static final String CENTRAL_REPLACEMENT = "$2" + CENTRAL_SHORT + "$4";
 
+	private static final Pattern BRAID_STATION_ = Pattern.compile("((^|\\W){1}(brad stn)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String BRAID_STATION_REPLACEMENT = "$2" + BRAID_STATION + "$4";
+
 	private static final Pattern REMOVE_DASH = Pattern.compile("(^(\\s)*\\-(\\s)*|(\\s)*\\-(\\s)*$)", Pattern.CASE_INSENSITIVE);
 
 	@Override
@@ -1699,6 +1738,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = S_F_U.matcher(tripHeadsign).replaceAll(S_F_U_REPLACEMENT);
 		tripHeadsign = U_B_C.matcher(tripHeadsign).replaceAll(U_B_C_REPLACEMENT);
 		tripHeadsign = V_C_C.matcher(tripHeadsign).replaceAll(V_C_C_REPLACEMENT);
+		tripHeadsign = BRAID_STATION_.matcher(tripHeadsign).replaceAll(BRAID_STATION_REPLACEMENT);
 		tripHeadsign = UNIVERSITY.matcher(tripHeadsign).replaceAll(UNIVERSITY_REPLACEMENT);
 		tripHeadsign = PORT_COQUITLAM.matcher(tripHeadsign).replaceAll(PORT_COQUITLAM_REPLACEMENT);
 		tripHeadsign = COQUITLAM.matcher(tripHeadsign).replaceAll(COQUITLAM_REPLACEMENT);
