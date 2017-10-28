@@ -352,6 +352,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String _3RD = "3rd";
 	private static final String _71 = "71";
 	private static final String KINGSWOOD = "Kingswood";
+	private static final String KINGSWAY = "Kingsway";
 
 	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
 	static {
@@ -703,6 +704,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == 16l) {
 			if (Arrays.asList( //
 					DOWNTOWN, //
+					KINGSWAY, //
 					_29TH_AVE_STATION //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(_29TH_AVE_STATION, mTrip.getHeadsignId());
