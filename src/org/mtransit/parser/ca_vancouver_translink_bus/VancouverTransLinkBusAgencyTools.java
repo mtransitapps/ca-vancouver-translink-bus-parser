@@ -222,7 +222,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String LOUGHEED_STATION = "Lougheed " + STATION_SHORT;
 	private static final String GILBERT = "Gilbert";
 	private static final String FIVE_RD = "Five Rd";
-	private static final String BRIGHOUSE_STATION = "Brighouse " + STATION_SHORT;
+	private static final String BRIGHOUSE = "Brighouse";
+	private static final String BRIGHOUSE_STATION = BRIGHOUSE + " " + STATION_SHORT;
 	private static final String BRIDGEPORT = "Bridgeport";
 	private static final String BRIDGEPORT_STATION = BRIDGEPORT + " " + STATION_SHORT;
 	private static final String RIVERSIDE = "Riverside";
@@ -1375,6 +1376,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(_22ND_ST_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (Arrays.asList( //
+					BRIGHOUSE, //
 					BRIGHOUSE_STATION, //
 					HAMILTON_PARK, //
 					QUEENSBORO, //
@@ -1658,9 +1660,6 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
 				return true;
 			}
-		}
-		if (isGoodEnoughAccepted()) {
-			return super.mergeHeadsign(mTrip, mTripToMerge);
 		}
 		System.out.printf("\nUnexpected tripts to merge %s & %s!\n", mTrip, mTripToMerge);
 		System.exit(-1);
