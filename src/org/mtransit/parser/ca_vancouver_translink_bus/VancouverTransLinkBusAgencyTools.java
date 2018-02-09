@@ -1215,6 +1215,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			} else if (Arrays.asList( //
 					PARK_ROYAL, //
+					"Express-" + HORSESHOE_BAY, //
 					HORSESHOE_BAY + AND + LIONS_BAY, //
 					HORSESHOE_BAY //
 					).containsAll(headsignsValues)) {
