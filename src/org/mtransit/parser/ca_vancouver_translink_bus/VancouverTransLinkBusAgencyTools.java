@@ -348,6 +348,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String BRUNSWICK = "Brunswick";
 	private static final String BLUEWATER = "Bluewater";
 	private static final String QUAYSIDE = "Quayside";
+	private static final String QUAYSIDE_DRIVE = QUAYSIDE + " Dr";
 	private static final String MAPLE_MEADOWS_STATION = "Maple " + MEADOWS_SHORT + SPACE + STATION_SHORT;
 	private static final String ST_DAVIDS = "St Davids";
 	private static final String _3RD = "3rd";
@@ -834,6 +835,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == 95l) {
 			if (Arrays.asList( //
+					KOOTENAY_LOOP, //
 					WILLINGDON, //
 					SFU //
 					).containsAll(headsignsValues)) {
@@ -1230,6 +1232,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(PARK_ROYAL, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 262L) {
+			if (Arrays.asList( //
+					HORSESHOE_BAY, //
+					LIONS_BAY + "- " + BRUNSWICK //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(LIONS_BAY + "- " + BRUNSWICK, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 314l) {
 			if (Arrays.asList( //
 					SPECIAL, //
@@ -1530,6 +1540,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			} else if (Arrays.asList( //
 					NEW_WEST_STATION, //
+					QUAYSIDE_DRIVE, //
 					QUAYSIDE //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(QUAYSIDE, mTrip.getHeadsignId());
