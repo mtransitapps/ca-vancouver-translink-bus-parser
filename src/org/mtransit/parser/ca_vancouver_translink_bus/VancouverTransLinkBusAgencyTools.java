@@ -1240,6 +1240,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(LIONS_BAY + "- " + BRUNSWICK, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 281L) {
+			if (Arrays.asList( //
+					"Snug Cv", //
+					"Eaglecliff" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Eaglecliff", mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 314l) {
 			if (Arrays.asList( //
 					SPECIAL, //
