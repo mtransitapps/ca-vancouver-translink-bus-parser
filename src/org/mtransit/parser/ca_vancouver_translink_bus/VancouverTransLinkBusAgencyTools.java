@@ -273,6 +273,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String IOCO = "Ioco";
 	private static final String CITY_HALL = "City Hall";
 	private static final String _16_AVE = "16 Ave";
+	private static final String _16TH = "16th";
 	private static final String KNIGHT_STREET = KNIGHT + SPACE + STREET_SHORT;
 	private static final String VICTORIA = "Victoria";
 	private static final String VICTORIA_HILL = VICTORIA + SPACE + HILL_SHORT;
@@ -602,7 +603,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
 		List<String> headsignsValues = Arrays.asList(mTrip.getHeadsignValue(), mTripToMerge.getHeadsignValue());
-		if (mTrip.getRouteId() == 2l) {
+		if (mTrip.getRouteId() == 2L) {
 			if (Arrays.asList( //
 					BURRARD_STATION, //
 					DOWNTOWN //
@@ -611,6 +612,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			} else if (Arrays.asList( //
 					MACDONALD + DASH + _16_AVE, //
+					MACDONALD + DASH + _16TH, //
 					MACDONALD //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(MACDONALD, mTrip.getHeadsignId());
@@ -1531,7 +1533,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(PT_HANEY_STATION, mTrip.getHeadsignId());
 				return true;
 			}
-		} else if (mTrip.getRouteId() == 741l) {
+		} else if (mTrip.getRouteId() == 741L) {
 			if (Arrays.asList( //
 					HANEY_PLACE, //
 					PT_HANEY_STATION //
@@ -1539,7 +1541,38 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(PT_HANEY_STATION, mTrip.getHeadsignId());
 				return true;
 			}
-		} else if (mTrip.getRouteId() == RID_SW_C + 3l) { // C3
+		} else if (mTrip.getRouteId() == 743L) {
+			if (Arrays.asList( //
+					SOUTH_HANEY, //
+					MAPLE_MEADOWS_STATION, //
+					MEADOWTOWN //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(MEADOWTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 744L) {
+			if (Arrays.asList( //
+					MAPLE_MEADOWS_STATION, //
+					MEADOWTOWN //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(MEADOWTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 746L) {
+			if (Arrays.asList( //
+					PT_HANEY_STATION, // ==
+					HANEY_PLACE //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(HANEY_PLACE, mTrip.getHeadsignId());
+				return true;
+			} else if (Arrays.asList( //
+					PT_HANEY_STATION, // ==
+					ALBION //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(ALBION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == RID_SW_C + 3L) { // C3
 			if (Arrays.asList( //
 					NEW_WEST_STATION, //
 					VICTORIA_HILL //
