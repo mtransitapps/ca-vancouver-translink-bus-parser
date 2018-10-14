@@ -231,7 +231,6 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String BRIGHOUSE_STATION = BRIGHOUSE + " " + STATION_SHORT;
 	private static final String BRIDGEPORT = "Bridgeport";
 	private static final String BRIDGEPORT_STATION = BRIDGEPORT + " " + STATION_SHORT;
-	private static final String RIVERSIDE = "Riverside";
 	private static final String CRESCENT_BEACH = "Cr Beach";
 	private static final String WHITE_ROCK = "White Rock";
 	private static final String NEW_WEST_STATION = "New West " + STATION_SHORT;
@@ -282,7 +281,6 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String KNIGHT_STREET = KNIGHT + SPACE + STREET_SHORT;
 	private static final String VICTORIA = "Victoria";
 	private static final String VICTORIA_HILL = VICTORIA + SPACE + HILL_SHORT;
-	private static final String LAKE_CITY_STATION = "Lk City " + STATION_SHORT;
 	private static final String METROTOWN_STATION = "Metrotown " + STATION_SHORT;
 	private static final String STANLEY_PARK = "Stanley Pk";
 	private static final String BOUNDARY = "Boundary";
@@ -298,11 +296,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String _29TH_AVE_STATION = "29th Ave " + STATION_SHORT;
 	private static final String _15TH_ST = "15th St";
 	private static final String GUILDFORD = "Guildford";
-	private static final String SEYMOUR = "Seymour";
 	private static final String INGLEWOOD = "Inglewood";
 	private static final String RIVERPORT = "Riverport";
 	private static final String STEVESTON = "Steveston";
-	private static final String BURQUITLAM_STATION = "Burquitlam " + STATION_SHORT;
 	private static final String WILLINGDON = "Willingdon";
 	private static final String CROWN = "Crown";
 	private static final String _41ST_OAK = "41st & Oak";
@@ -352,7 +348,6 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String HIGHLAND = "Highland";
 	private static final String SCHOOL = "School";
 	private static final String BRUNSWICK = "Brunswick";
-	private static final String BLUEWATER = "Bluewater";
 	private static final String QUAYSIDE = "Quayside";
 	private static final String QUAYSIDE_DRIVE = QUAYSIDE + " Dr";
 	private static final String MAPLE_MEADOWS_STATION = "Maple " + MEADOWS_SHORT + SPACE + STATION_SHORT;
@@ -1755,7 +1750,17 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final Pattern FLAG_STOP = Pattern.compile("((^flagstop)[\\s]*(.*$))", Pattern.CASE_INSENSITIVE);
 	private static final String FLAG_STOP_REPLACEMENT = "$3 ($2)";
 
-	private static final Pattern BOUND = Pattern.compile("((^|\\W){1}(eb|wb|sb|nb)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final Pattern EASTBOUND_ = Pattern.compile("((^|\\W){1}(eastbound)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String EASTBOUND_REPLACEMENT = "$2" + "EB" + "$4";
+
+	private static final Pattern WESTBOUND_ = Pattern.compile("((^|\\W){1}(westbound)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String WESTBOUND_REPLACEMENT = "$2" + "WB" + "$4";
+
+	private static final Pattern NORTHBOUND_ = Pattern.compile("((^|\\W){1}(northbound)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String NORTHBOUND_REPLACEMENT = "$2" + "NB" + "$4";
+
+	private static final Pattern SOUTHBOUND_ = Pattern.compile("((^|\\W){1}(southbound)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String SOUTHBOUND_REPLACEMENT = "$2" + "SB" + "$4";
 
 	private static final Pattern UNLOADING = Pattern.compile("(unloading( only)?$)", Pattern.CASE_INSENSITIVE);
 
@@ -1765,9 +1770,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String cleanStopName(String gStopName) {
-		gStopName = gStopName.toLowerCase(Locale.ENGLISH);
+		if (Utils.isUppercaseOnly(gStopName, true, true)) {
+			gStopName = gStopName.toLowerCase(Locale.ENGLISH);
+		}
 		gStopName = CleanUtils.cleanSlashes(gStopName);
-		gStopName = BOUND.matcher(gStopName).replaceAll(SPACE);
+		gStopName = EASTBOUND_.matcher(gStopName).replaceAll(EASTBOUND_REPLACEMENT);
+		gStopName = WESTBOUND_.matcher(gStopName).replaceAll(WESTBOUND_REPLACEMENT);
+		gStopName = NORTHBOUND_.matcher(gStopName).replaceAll(NORTHBOUND_REPLACEMENT);
+		gStopName = SOUTHBOUND_.matcher(gStopName).replaceAll(SOUTHBOUND_REPLACEMENT);
 		gStopName = CleanUtils.SAINT.matcher(gStopName).replaceAll(CleanUtils.SAINT_REPLACEMENT);
 		gStopName = AT_LIKE.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
 		gStopName = CleanUtils.CLEAN_AT.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
