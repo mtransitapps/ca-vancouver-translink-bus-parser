@@ -299,6 +299,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String INGLEWOOD = "Inglewood";
 	private static final String RIVERPORT = "Riverport";
 	private static final String STEVESTON = "Steveston";
+	private static final String BURQUITLAM_STATION = "Burquitlam " + STATION_SHORT;
 	private static final String WILLINGDON = "Willingdon";
 	private static final String CROWN = "Crown";
 	private static final String _41ST_OAK = "41st & Oak";
@@ -929,6 +930,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(PHIBBS_EXCHANGE, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 143L) {
+			if (Arrays.asList( //
+					BURQUITLAM_STATION, // <>
+					SFU //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(SFU, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 159l) {
 			if (Arrays.asList( //
 					"Brad Sta", //
@@ -1099,7 +1108,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(GROUSE_MTN, mTrip.getHeadsignId());
 				return true;
 			}
-		} else if (mTrip.getRouteId() == 250l) {
+		} else if (mTrip.getRouteId() == 250L) {
 			if (Arrays.asList( //
 					PARK_ROYAL, //
 					VANCOUVER //
@@ -1217,6 +1226,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					SUNBURY //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(SUNBURY, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 319L) {
+			if (Arrays.asList( //
+					SCOTTSDALE, //
+					NEWTON_EXCH //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(NEWTON_EXCH, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 320l) {
