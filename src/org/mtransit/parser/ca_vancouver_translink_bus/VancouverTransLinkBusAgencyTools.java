@@ -851,13 +851,20 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(UBC, mTrip.getHeadsignId());
 				return true;
 			}
-		} else if (mTrip.getRouteId() == 95l) {
+		} else if (mTrip.getRouteId() == 95L) {
 			if (Arrays.asList( //
 					KOOTENAY_LOOP, //
 					WILLINGDON, //
 					SFU //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(SFU, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					"Waterfront Sta", //
+					BURRARD_STATION //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(BURRARD_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 99l) {
@@ -1301,6 +1308,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == 351l) {
 			if (Arrays.asList( //
 					WHITE_ROCK + SPACE + CENTER_SHORT, //
+					"S Sry " + "Pk & Ride", //
 					CRESCENT_BEACH //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(CRESCENT_BEACH, mTrip.getHeadsignId());
@@ -1480,6 +1488,22 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					BRIDGEPORT_STATION //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(BRIDGEPORT_STATION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 616L) {
+			if (Arrays.asList( //
+					LADNER + " South", //
+					"South " + LADNER //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("South " + LADNER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 618L) {
+			if (Arrays.asList( //
+					LADNER + " North", //
+					"North " + LADNER //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("North " + LADNER, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 701l) {
