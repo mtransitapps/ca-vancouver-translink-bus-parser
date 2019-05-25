@@ -34,6 +34,7 @@ import org.mtransit.parser.mt.data.MTripStop;
 // http://mapexport.translink.bc.ca/current/google_transit.zip
 // http://ns.translink.ca/gtfs/notifications.zip
 // http://ns.translink.ca/gtfs/google_transit.zip
+// http://gtfs.translink.ca/static/latest
 public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	public static void main(String[] args) {
@@ -113,9 +114,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String N = "N";
 	private static final String P = "P";
 
-	private static final long RID_SW_C = 30000;
-	private static final long RID_SW_N = 140000;
-	private static final long RID_SW_P = 160000;
+	private static final long RID_SW_C = 30_000L;
+	private static final long RID_SW_N = 140_000L;
+	private static final long RID_SW_P = 160_000L;
 
 	@Override
 	public long getRouteId(GRoute gRoute) {
@@ -1685,6 +1686,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (mTrip.getRouteId() == RID_SW_N + 24L) { // N24
 			if (Arrays.asList( //
+					LONSDALE_QUAY, //
 					_3RD + AND + ST_DAVIDS, //
 					DOWNTOWN //
 					).containsAll(headsignsValues)) {
