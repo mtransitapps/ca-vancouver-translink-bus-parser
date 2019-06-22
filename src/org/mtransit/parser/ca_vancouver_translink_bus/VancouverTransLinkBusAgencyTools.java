@@ -376,10 +376,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				1, MTrip.HEADSIGN_TYPE_STRING, PHIBBS_EXCHANGE) //
 				.addTripSort(0, //
 						Arrays.asList(new String[] { //
-						"4119", // PHIBBS EXCHANGE BAY 7
-								"10879", // ==
-								"4263", // <> SB DUVAL RD FS DRAYCOTT RD
-								"4045", // ==
+						"4119", // PHIBBS EXCHANGE BAY 7 <=
+								"10879", // !=
+								"4263", // <> != SB DUVAL RD FS DRAYCOTT RD <=
+								"4264", // <>
+								"4045", // != ==
 								"10882", // EB LYNN VALLEY NS MOUNTAIN HWY
 						})) //
 				.addTripSort(1, //
@@ -387,7 +388,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 						"10882", // EB LYNN VALLEY NS MOUNTAIN HWY
 								"4262", // !=
 								"4263", // <> SB DUVAL RD FS DRAYCOTT
-								"4264", // !=
+								"4264", // <>
+								"4265", // !=
 								"1761", // PHIBBS EXCHANGE BAY 5
 						})) //
 				.compileBothTripSort());
