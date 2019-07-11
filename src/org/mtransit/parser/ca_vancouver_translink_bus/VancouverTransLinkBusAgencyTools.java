@@ -850,6 +850,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == 49L) {
 			if (Arrays.asList( //
 					"Langara-49th Ave Sta", //
+					"Langara-49th Sta", //
 					GRANVILLE, //
 					DUNBAR_LOOP, //
 					UBC //
