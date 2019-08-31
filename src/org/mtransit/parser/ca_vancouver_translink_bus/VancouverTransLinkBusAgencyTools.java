@@ -359,6 +359,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String _71 = "71";
 	private static final String KINGSWOOD = "Kingswood";
 	private static final String KINGSWAY = "Kingsway";
+	private static final String ALDERGROVE = "Aldergrove";
 
 	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
 	static {
@@ -1105,13 +1106,22 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(LONSDALE_QUAY, mTrip.getHeadsignId());
 				return true;
-			} else if (Arrays.asList( //
+			}
+			if (Arrays.asList( //
 					HIGHLAND, //
 					MARINE + AND + GARDEN_SHORT, //
 					MARINE + AND + CAPILANO, //
 					VANCOUVER //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					MARINE + AND + GARDEN_SHORT, //
+					MARINE + AND + CAPILANO, //
+					DOWNTOWN //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 247L) {
@@ -1125,6 +1135,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == 250L) {
 			if (Arrays.asList( //
 					PARK_ROYAL, //
+					"Vancouver Events Bus", // TODO cleanup ?
 					VANCOUVER //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
@@ -1321,6 +1332,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(CRESCENT_BEACH, mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 373L) {
+			if (Arrays.asList( //
+					"Kindersley Dr", //
+					GUILDFORD //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(GUILDFORD, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 401L) {
 			if (Arrays.asList( //
 					HORSESHOE_WAY, //
@@ -1434,6 +1453,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
 				return true;
 			}
+			if (Arrays.asList( //
+					LANGLEY_CTR, //
+					ALDERGROVE //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(ALDERGROVE, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (mTrip.getRouteId() == 509L) {
 			if (Arrays.asList( //
 					CARVOLTH_EXCH, //
@@ -1511,6 +1537,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					"North " + LADNER //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString("North " + LADNER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 640L) {
+			if (Arrays.asList( //
+					"Tillbury", //
+					LADNER_EXCH //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(LADNER_EXCH, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 701L) {
@@ -1712,6 +1746,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern STARTS_WITH_ROUTE = Pattern.compile("(^[A-Z]{0,1}[0-9]{1,3}[\\s]+{1})", Pattern.CASE_INSENSITIVE);
 
+	private static final Pattern STARTS_WITH_SLASH = Pattern.compile("(^.* / )", Pattern.CASE_INSENSITIVE);
+
 	private static final Pattern EXPRESS = Pattern.compile("(\\-?( express|express )\\-?)", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern SPECIAL_ = Pattern.compile("(\\-?( special|special )\\-?)", Pattern.CASE_INSENSITIVE);
@@ -1767,6 +1803,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = STARTS_WITH_QUOTE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = ENDS_WITH_QUOTE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = STARTS_WITH_ROUTE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
+		tripHeadsign = STARTS_WITH_SLASH.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = ENDS_WITH_B_LINE.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
 		tripHeadsign = CleanUtils.CLEAN_AND.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
 		tripHeadsign = CleanUtils.CLEAN_AT.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
