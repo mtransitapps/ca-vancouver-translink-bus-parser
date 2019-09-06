@@ -436,9 +436,33 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "7259", "7260", "7317", "7318", "7319", "7322", "7347", "9593", "9591", "11805" })) //
+						Arrays.asList(new String[] { //
+						"7259", // != "57188", // Langley Centre @ Bay 6 <=
+								"7260", // ++
+								"7275", // !=
+								"7319", // != "57248", // Northbound Trattle St @ 9000 Block <=
+								"7320", // != <>
+								"7321", // != <> ??
+								"7322", // != <>
+								"7276", // ==
+								"7347", // ++
+								"11805", // "61709", // Carvolth Exchange @ Bay 1
+						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "9592", "7317", "7322", "5352", "7259" })) //
+						Arrays.asList(new String[] { //
+						"11801", // "61719", // Carvolth Exchange @ Bay 11 <=
+								"9597", // ++
+								"7316", // ++
+								"7317", // == "57246", // Northbound Trattle St @ 88 Ave <=
+								"7318", // ==
+								"7319", // <> "57248", // Northbound Trattle St @ 9000 Block
+								"7320", // <>
+								"7321", // ==
+								"7322", // <>
+								"7323", // ==
+								"5352", // ++
+								"7259", // "57188", // Langley Centre @ Bay 6
+						})) //
 				.compileBothTripSort());
 		map2.put(828L, new RouteTripSpec(828L, //
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
