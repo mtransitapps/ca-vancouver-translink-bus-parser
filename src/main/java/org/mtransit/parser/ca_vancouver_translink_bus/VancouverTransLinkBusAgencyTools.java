@@ -297,6 +297,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String _29TH_AVE_STATION = "29th Ave " + STATION_SHORT;
 	private static final String _15TH_ST = "15th St";
 	private static final String GUILDFORD = "Guildford";
+	private static final String GUILDFORD_EXCH = GUILDFORD + " " + EXCHANGE_SHORT;
 	private static final String INGLEWOOD = "Inglewood";
 	private static final String RIVERPORT = "Riverport";
 	private static final String STEVESTON = "Steveston";
@@ -897,6 +898,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					BURRARD_STATION //
 					).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(BURRARD_STATION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 96L) {
+			if (Arrays.asList( //
+					GUILDFORD_EXCH, //
+					GUILDFORD //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(GUILDFORD, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (mTrip.getRouteId() == 99L) {
