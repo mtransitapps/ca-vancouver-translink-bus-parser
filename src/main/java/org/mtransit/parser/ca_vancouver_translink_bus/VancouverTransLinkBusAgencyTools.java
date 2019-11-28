@@ -23,7 +23,6 @@ import org.mtransit.parser.mt.data.MTripStop;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -264,6 +263,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String UPPER_CAPILANO = UPPER + SPACE + CAPILANO;
 	private static final String UPPER_LONSDALE = UPPER + " Lonsdale";
 	private static final String LYNN_VALLEY = "Lynn " + VALLEY_SHORT;
+	private static final String LYNN_VALLEY_CENTER = LYNN_VALLEY + SPACE + CENTER_SHORT;
 	private static final String UPPER_LYNN_VALLEY = UPPER + SPACE + LYNN_VALLEY;
 	private static final String LONSDALE_QUAY = "Lonsdale Quay";
 	private static final String BLUERIDGE = "Blueridge";
@@ -376,239 +376,152 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	static {
 		HashMap<Long, RouteTripSpec> map2 = new HashMap<>();
-		map2.put(214L, new RouteTripSpec(214L, //
-				0, MTrip.HEADSIGN_TYPE_STRING, BLUERIDGE, //
-				1, MTrip.HEADSIGN_TYPE_STRING, VANCOUVER) //
-				.addTripSort(0, //
-						Arrays.asList("4154", "4113", "4116", "4118", "4067", "4163", "11553", "409")) //
-				.addTripSort(1, //
-						Arrays.asList("409", "4143", "4068", "4069", "4070", "4071", "4072", "4154")) //
-				.compileBothTripSort());
-		map2.put(227L, new RouteTripSpec(227L, //
-				0, MTrip.HEADSIGN_TYPE_STRING, LYNN_VALLEY + SPACE + CENTER_SHORT, //
-				1, MTrip.HEADSIGN_TYPE_STRING, PHIBBS_EXCHANGE) //
-				.addTripSort(0, //
-						Arrays.asList(//
-								"4119", // PHIBBS EXCHANGE BAY 7 <=
-								"10879", // !=
-								"4263", // <> != SB DUVAL RD FS DRAYCOTT RD <=
-								"4264", // <>
-								"4045", // != ==
-								"10882" // EB LYNN VALLEY NS MOUNTAIN HWY
-						)) //
-				.addTripSort(1, //
-						Arrays.asList(//
-								"10882", // EB LYNN VALLEY NS MOUNTAIN HWY
-								"4262", // !=
-								"4263", // <> SB DUVAL RD FS DRAYCOTT
-								"4264", // <>
-								"4265", // !=
-								"1761" // PHIBBS EXCHANGE BAY 5
-						)) //
-				.compileBothTripSort());
-		map2.put(555L, new RouteTripSpec(555L, //
+		map2.put(20_667L, new RouteTripSpec(20_667L, // 555
 				0, MTrip.HEADSIGN_TYPE_STRING, CARVOLTH_EXCH, //
 				1, MTrip.HEADSIGN_TYPE_STRING, LOUGHEED_STATION) //
 				.addTripSort(0, //
 						Arrays.asList(//
-								"8672", // LOUGHEED STN BAY 8
-								"11805" // CARVOLTH EXCHANGE BAY 1
+								Stops.getALL_STOPS().get("58432"), // LOUGHEED STN BAY 8
+								Stops.getALL_STOPS().get("61709") // CARVOLTH EXCHANGE BAY 1
 						)) //
 				.addTripSort(1, //
 						Arrays.asList(//
-								"11799", // CARVOLTH EXCHANGE BAY 9
-								"8691" // LOUGHEED STN BAY 6
+								Stops.getALL_STOPS().get("61717"), // CARVOLTH EXCHANGE BAY 9
+								Stops.getALL_STOPS().get("58432") // LOUGHEED STN BAY 6
 						)) //
 				.compileBothTripSort());
-		map2.put(606L, new RouteTripSpec(606L, //
+		map2.put(6_745L, new RouteTripSpec(6_745L, // 606
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList("7572", "7582", "7591" /* "12126" */)) //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("57499"), // NB 46A St @ River Rd W
+								Stops.getALL_STOPS().get("57518") // Ladner Exchange @ Bay 7
+						)) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(/* "12128" */"7591", "7460", "7572")) //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("57518"), // Ladner Exchange @ Bay 7
+								Stops.getALL_STOPS().get("57499") // NB 46A St @ River Rd W
+						)) //
 				.compileBothTripSort());
-		map2.put(608L, new RouteTripSpec(608L, //
+		map2.put(6_746L, new RouteTripSpec(6_746L, // 608
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList("7602", "7478", "7591" /* "12130" */)) //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("57529"), // SB 46A St @ River Rd West
+								Stops.getALL_STOPS().get("57518") // Ladner Exch @ Bay 7
+						)) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(/* "12130" */"7591", "7621", "7602")) //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("57518"), // Ladner Exch @ Bay 7
+								Stops.getALL_STOPS().get("57529") // SB 46A St @ River Rd West
+						)) //
 				.compileBothTripSort());
-		map2.put(804L, new RouteTripSpec(804L, //
+		map2.put(8_291L, new RouteTripSpec(8_291L, // 804
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList("5743", "6003", "9452")) //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("55688"), // Newton Exch @ Bay 7
+								Stops.getALL_STOPS().get("58261") // WB 88 Ave @ 160 St
+						)) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList("5918", "5933", "4845")) //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("55862"), // SB 160 St @ 88 Ave
+								Stops.getALL_STOPS().get("54793") // Scottsdale Exch @ Bay 6
+						)) //
 				.compileBothTripSort());
-		map2.put(807L, new RouteTripSpec(807L, //
+		map2.put(6_754L, new RouteTripSpec(6_754L, // 855
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("56365"), // WB 24 Ave @ 134 St
+								Stops.getALL_STOPS().get("58600") // WB 32 Ave @ 152 St
+						)) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("56075"), // SB 152 St @ 32 Ave
+								Stops.getALL_STOPS().get("56372") // EB 24 Ave @ 136 St
+						)) //
+				.compileBothTripSort());
+		map2.put(6_755L, new RouteTripSpec(6_755L, // 861
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(//
-								"7259", // != "57188", // Langley Centre @ Bay 6 <=
-								"7260", // ++
-								"7275", // !=
-								"7319", // != "57248", // Northbound Trattle St @ 9000 Block <=
-								"7320", // != <>
-								"7321", // != <> ??
-								"7322", // != <>
-								"7276", // ==
-								"7347", // ++
-								"11805" // "61709", // Carvolth Exchange @ Bay 1
+						Arrays.asList(
+								Stops.getALL_STOPS().get("53771"), // NB Western Dr @ Eastern Dr
+								Stops.getALL_STOPS().get("53025") // SB Shaughnessy St @ McAllister Ave
 						)) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(//
-								"11801", // "61719", // Carvolth Exchange @ Bay 11 <=
-								"9597", // ++
-								"7316", // ++
-								"7317", // == "57246", // Northbound Trattle St @ 88 Ave <=
-								"7318", // ==
-								"7319", // <> "57248", // Northbound Trattle St @ 9000 Block
-								"7320", // <>
-								"7321", // ==
-								"7322", // <>
-								"7323", // ==
-								"5352", // ++
-								"7259" // "57188", // Langley Centre @ Bay 6
+						Arrays.asList(
+								Stops.getALL_STOPS().get("53737"), // NB Reeve St @ Hawthorne Ave
+								Stops.getALL_STOPS().get("53771") // NB Western Dr @ Eastern Dr
 						)) //
 				.compileBothTripSort());
-		map2.put(828L, new RouteTripSpec(828L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList("5768", "5840", "5852")) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList("5852", "5861", "5769")) //
-				.compileBothTripSort());
-		map2.put(848L, new RouteTripSpec(848L, //
-				0, MTrip.HEADSIGN_TYPE_STRING, "", //
-				1, MTrip.HEADSIGN_TYPE_STRING, LOUGHEED_STATION) //
-				.addTripSort(0, //
-						Collections.emptyList()) //
-				.addTripSort(1, //
-						Arrays.asList(//
-								"3221", // WB SAINT JOHNS ST FS BARNET HWY
-								"8691" // LOUGHEED STN BAY 6
-						)) //
-				.compileBothTripSort());
-		map2.put(855L, new RouteTripSpec(855L, //
+		map2.put(6_761L, new RouteTripSpec(6_761L, // 880
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList("6425", "6153", "9062")) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList("6133", "8806", "9132")) //
-				.compileBothTripSort());
-		map2.put(861L, new RouteTripSpec(861L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList("3810", "3814", "3057")) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList("3776", "3732", "3810")) //
-				.compileBothTripSort());
-		map2.put(863L, new RouteTripSpec(863L, //
-				0, MTrip.HEADSIGN_TYPE_STRING, "Arch Carney", //
-				1, MTrip.HEADSIGN_TYPE_STRING, "") //
-				.addTripSort(0, //
-						Arrays.asList(//
-								"3823", // EB RIVERWOOD GATE AT TERRY FOX SECONDARY
-								"3868" // SB SHAUGHNESSY ST FS PRAIRIE AVE
+						Arrays.asList(
+								Stops.getALL_STOPS().get("54423"), // Capilano University @ Bay 5
+								Stops.getALL_STOPS().get("54101") // NB Emerson Way @ Mt Seymour Parkway
 						)) //
-				.addTripSort(1, //
-						Collections.emptyList()) //
-				.compileBothTripSort());
-		map2.put(865L, new RouteTripSpec(865L, //
-				0, MTrip.HEADSIGN_TYPE_STRING, "", //
-				1, MTrip.HEADSIGN_TYPE_STRING, HANEY_PLACE) //
-				.addTripSort(0, //
-						Collections.emptyList()) //
-				.addTripSort(1, //
-						Arrays.asList(//
-								"9635", // WB 104 AVE FS 245 ST
-								"10891" // HANEY PLACE BAY 7 UNLOADING ONLY
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("54792"), // WB Mt Seymour Parkway @ Lytton St
+								Stops.getALL_STOPS().get("54423") // Capilano University @ Bay 5
 						)) //
 				.compileBothTripSort());
-		map2.put(867L, new RouteTripSpec(867L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList("11940", "3317", "9337")) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList("9336", "9650", "3221", "9337", "3394")) //
-				.compileBothTripSort());
-		map2.put(880L, new RouteTripSpec(880L, //
+		map2.put(6_762L, new RouteTripSpec(6_762L, // 881
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList("4473", "4070", "4144")) //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("54390"), // EB W 22 St @ Philip Ave
+								Stops.getALL_STOPS().get("61336"), // != EB Larson Rd @ Fir St
+								Stops.getALL_STOPS().get("57943"), // <> SB Jones Ave @ W 21 St
+								Stops.getALL_STOPS().get("54454"), // != // EB W 15 St @ Jones Ave
+								Stops.getALL_STOPS().get("54179") // EB E 15 St @ Grand Blvd East
+						)) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList("4113", "4118", "4473")) //
-				.compileBothTripSort());
-		map2.put(881L, new RouteTripSpec(881L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList("4439", "8018", "4224")) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList("8018", "4430", "4438")) //
-				.compileBothTripSort());
-		map2.put(895L, new RouteTripSpec(895L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList("12084", "10935")) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList("10935", "12084")) //
-				.compileBothTripSort());
-		map2.put(RID_SW_C + 19L, new RouteTripSpec(RID_SW_C + 19L, // C19
-				0, MTrip.HEADSIGN_TYPE_STRING, ALMA, //
-				1, MTrip.HEADSIGN_TYPE_STRING, "Spanish Banks") //
-				// MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
-				// MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
-				.addTripSort(0, //
-						Arrays.asList("11002", "355", "674")) //
-				.addTripSort(1, //
-						Arrays.asList("674", "599", "11002")) //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("57943"), // <> SB Jones Ave @ W 21 St
+								Stops.getALL_STOPS().get("54467"),// != SB Jones Ave @ W 15 St
+								Stops.getALL_STOPS().get("54389") // SB Jones Ave @ W 21 St
+						)) //
 				.compileBothTripSort());
 		ALL_ROUTE_TRIPS2 = map2;
 	}
 
 	@Override
 	public int compareEarly(long routeId, List<MTripStop> list1, List<MTripStop> list2, MTripStop ts1, MTripStop ts2, GStop ts1GStop, GStop ts2GStop) {
-		long rsn = this.routeOriginalIdToRSN.get(routeId);
-		if (ALL_ROUTE_TRIPS2.containsKey(rsn)) {
-			return ALL_ROUTE_TRIPS2.get(rsn).compare(rsn, list1, list2, ts1, ts2, ts1GStop, ts2GStop, this);
+		if (ALL_ROUTE_TRIPS2.containsKey(routeId)) {
+			return ALL_ROUTE_TRIPS2.get(routeId).compare(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop, this);
 		}
 		return super.compareEarly(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop);
 	}
 
 	@Override
 	public ArrayList<MTrip> splitTrip(MRoute mRoute, GTrip gTrip, GSpec gtfs) {
-		long rsn = this.routeOriginalIdToRSN.get(mRoute.getId());
-		if (ALL_ROUTE_TRIPS2.containsKey(rsn)) {
-			return ALL_ROUTE_TRIPS2.get(rsn).getAllTrips();
+		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
+			return ALL_ROUTE_TRIPS2.get(mRoute.getId()).getAllTrips();
 		}
 		return super.splitTrip(mRoute, gTrip, gtfs);
 	}
 
 	@Override
 	public Pair<Long[], Integer[]> splitTripStop(MRoute mRoute, GTrip gTrip, GTripStop gTripStop, ArrayList<MTrip> splitTrips, GSpec routeGTFS) {
-		long rsn = this.routeOriginalIdToRSN.get(mRoute.getId());
-		if (ALL_ROUTE_TRIPS2.containsKey(rsn)) {
-			return SplitUtils.splitTripStop(mRoute, gTrip, gTripStop, routeGTFS, ALL_ROUTE_TRIPS2.get(rsn), this);
+		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
+			return SplitUtils.splitTripStop(mRoute, gTrip, gTripStop, routeGTFS, ALL_ROUTE_TRIPS2.get(mRoute.getId()), this);
 		}
 		return super.splitTripStop(mRoute, gTrip, gTripStop, splitTrips, routeGTFS);
 	}
 
 	@Override
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
-		long rsn = this.routeOriginalIdToRSN.get(mRoute.getId());
-		if (ALL_ROUTE_TRIPS2.containsKey(rsn)) {
+		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return; // split
 		}
 		String gTripHeadsign = gTrip.getTripHeadsign();
@@ -1066,13 +979,22 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
 				return true;
 			}
-			//		} else if (mTrip.getRouteId() == 227L) {
-			//			if (Arrays.asList( //
-			//					PHIBBS_EXCHANGE //
-			//					).containsAll(headsignsValues)) {
-			//				mTrip.setHeadsignString(PHIBBS_EXCHANGE, mTrip.getHeadsignId());
-			//				return true;
-			//			}
+		} else if (rsn == 214L) {
+			if (Arrays.asList( //
+					PHIBBS_EXCHANGE, //
+					VANCOUVER //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (rsn == 227L) {
+			if (Arrays.asList( //
+					LYNN_VALLEY_CENTER, // <>
+					PHIBBS_EXCHANGE //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(PHIBBS_EXCHANGE, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (rsn == 228L) {
 			if (Arrays.asList( //
 					GRAND_BLVD + AND + _15_ST, //
