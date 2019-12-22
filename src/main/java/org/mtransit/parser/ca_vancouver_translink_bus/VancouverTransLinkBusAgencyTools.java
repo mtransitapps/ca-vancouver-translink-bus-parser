@@ -114,10 +114,12 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String C = "C";
 	private static final String N = "N";
 	private static final String P = "P";
+	private static final String R = "R";
 
 	private static final long RID_SW_C = 30_000L;
 	private static final long RID_SW_N = 140_000L;
 	private static final long RID_SW_P = 160_000L;
+	private static final long RID_SW_R = 180_000L;
 
 	private HashMap<Long, Long> routeOriginalIdToRSN = new HashMap<>();
 
@@ -136,6 +138,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					rsn = RID_SW_N + id;
 				} else if (gRoute.getRouteShortName().startsWith(P)) {
 					rsn = RID_SW_P + id;
+				} else if (gRoute.getRouteShortName().startsWith(R)) {
+					rsn = RID_SW_R + id;
 				}
 			}
 		}
@@ -182,6 +186,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final String NIGHT_BUS_COLOR = "062F53"; // DARK BLUE (from PDF map)
 	private static final String B_LINE_BUS_COLOR = "F46717"; // ORANGE (from PDF map)
+	private static final String RAPID_BUS_COLOR = "199354"; // GREEN (from PDF map)
 
 	private static final String B_LINE = "B-LINE";
 
@@ -189,6 +194,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	public String getRouteColor(GRoute gRoute) {
 		if (gRoute.getRouteShortName().startsWith(N)) {
 			return NIGHT_BUS_COLOR;
+		}
+		if (gRoute.getRouteShortName().startsWith(R)) {
+			return RAPID_BUS_COLOR;
 		}
 		if (gRoute.getRouteLongName().contains(B_LINE)) {
 			return B_LINE_BUS_COLOR;
@@ -782,12 +790,15 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (rsn == 41L) {
 			if (Arrays.asList( //
+					GRANVILLE, //
 					_41ST_OAK, //
 					JOYCE_STATION //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(JOYCE_STATION, mTrip.getHeadsignId());
 				return true;
-			} else if (Arrays.asList( //
+			}
+			if (Arrays.asList( //
+					GRANVILLE, //
 					_41ST_OAK, //
 					CROWN, //
 					DUNBAR, //
@@ -1427,8 +1438,17 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (rsn == 509L) {
 			if (Arrays.asList( //
+					WALNUT_GROVE, // <>
+					SURREY_CENTRAL_STATION // <>
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(SURREY_CENTRAL_STATION, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					LANGLEY_CTR, //
 					CARVOLTH_EXCH, //
-					WALNUT_GROVE //
+					SURREY_CENTRAL_STATION, // <>
+					WALNUT_GROVE // <>
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(WALNUT_GROVE, mTrip.getHeadsignId());
 				return true;
@@ -1453,6 +1473,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					LOUGHEED_STATION //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(LOUGHEED_STATION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (rsn == 595L) {
+			if (Arrays.asList( //
+					MAPLE_MEADOWS_STATION, //
+					"Rdg Mdws" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Rdg Mdws", mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (rsn == 601L) {
@@ -1665,6 +1693,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (rsn == RID_SW_N + 9L) { // N9
 			if (Arrays.asList( //
+					"Production Sta", //
 					LOUGHEED_STATION, //
 					DOWNTOWN //
 			).containsAll(headsignsValues)) {
@@ -1694,6 +1723,21 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					DOWNTOWN //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (rsn == RID_SW_R + 5L) { // R5
+			if (Arrays.asList( //
+					KOOTENAY_LOOP, //
+					SFU //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(SFU, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					"Waterfront Sta", //
+					BURRARD_STATION //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(BURRARD_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		}
