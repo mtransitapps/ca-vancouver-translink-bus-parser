@@ -85,7 +85,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			"991", // MILLENNIUM SKYTRAIN
 			"992", // EXPO SKYTRAIN
 			"997", // WEST COAST EXPRESS
-			"998"// SEABUS
+			"998" // SEABUS
 	);
 
 	@Override
@@ -384,6 +384,20 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	static {
 		HashMap<Long, RouteTripSpec> map2 = new HashMap<>();
+		map2.put(38_311L, new RouteTripSpec(38_311L, // R2 // SPLITTED TO FIX SAME trip_headsign FOR 2 DIRECTIONS
+				0, MTrip.HEADSIGN_TYPE_STRING, PHIBBS_EXCHANGE, //
+				1, MTrip.HEADSIGN_TYPE_STRING, PARK_ROYAL) //
+				.addTripSort(0, //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("54411"), // EB Marine Dr @ Park Royal South
+								Stops.getALL_STOPS().get("54100") // Phibbs Exchange @ Bay 2
+						)) //
+				.addTripSort(1, //
+						Arrays.asList(
+								Stops.getALL_STOPS().get("54100"), // Phibbs Exchange @ Bay 2
+								Stops.getALL_STOPS().get("61769") // EB Marine Dr @ South Mall Access Layover
+						)) //
+				.compileBothTripSort());
 		map2.put(20_667L, new RouteTripSpec(20_667L, // 555
 				0, MTrip.HEADSIGN_TYPE_STRING, CARVOLTH_EXCH, //
 				1, MTrip.HEADSIGN_TYPE_STRING, LOUGHEED_STATION) //
@@ -967,6 +981,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
 				return true;
 			}
+			if (Arrays.asList( //
+					PHIBBS_EXCHANGE, //
+					BURRARD_STATION //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(BURRARD_STATION, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (rsn == 210L) {
 			if (Arrays.asList( //
 					PHIBBS_EXCHANGE, //
@@ -982,6 +1003,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
 				return true;
 			}
+			if (Arrays.asList( //
+					PHIBBS_EXCHANGE, //
+					BURRARD_STATION //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(BURRARD_STATION, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (rsn == 211L) {
 			if (Arrays.asList( //
 					PHIBBS_EXCHANGE, //
@@ -990,12 +1018,26 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
 				return true;
 			}
+			if (Arrays.asList( //
+					PHIBBS_EXCHANGE, //
+					BURRARD_STATION //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(BURRARD_STATION, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (rsn == 214L) {
 			if (Arrays.asList( //
 					PHIBBS_EXCHANGE, //
 					VANCOUVER //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					PHIBBS_EXCHANGE, //
+					BURRARD_STATION //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(BURRARD_STATION, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (rsn == 227L) {
@@ -1065,6 +1107,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					VANCOUVER //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(VANCOUVER, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					_15TH_ST, //
+					DOWNTOWN //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (rsn == 242L) {
@@ -1723,6 +1772,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					DOWNTOWN //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					LONSDALE_QUAY, //
+					LYNN_VALLEY //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(LYNN_VALLEY, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (rsn == RID_SW_R + 5L) { // R5
