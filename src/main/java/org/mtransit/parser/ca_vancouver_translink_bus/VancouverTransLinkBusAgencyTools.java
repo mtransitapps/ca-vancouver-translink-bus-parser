@@ -395,6 +395,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(1, //
 						Arrays.asList(
 								Stops.getALL_STOPS().get("54100"), // Phibbs Exchange @ Bay 2
+								Stops.getALL_STOPS().get("61772"), // WB Marine Dr @ Park Royal
 								Stops.getALL_STOPS().get("61769") // EB Marine Dr @ South Mall Access Layover
 						)) //
 				.compileBothTripSort());
