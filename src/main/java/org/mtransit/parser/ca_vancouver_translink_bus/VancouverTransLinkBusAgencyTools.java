@@ -1,6 +1,8 @@
 package org.mtransit.parser.ca_vancouver_translink_bus;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.MTLog;
@@ -38,7 +40,7 @@ import java.util.regex.Pattern;
 // http://gtfs.translink.ca/static/latest
 public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
-	public static void main(String[] args) {
+	public static void main(@Nullable String[] args) {
 		if (args == null || args.length == 0) {
 			args = new String[3];
 			args[0] = "input/gtfs.zip";
@@ -48,10 +50,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		new VancouverTransLinkBusAgencyTools().start(args);
 	}
 
+	@Nullable
 	private HashSet<String> serviceIds;
 
 	@Override
-	public void start(String[] args) {
+	public void start(@NotNull String[] args) {
 		MTLog.log("Generating TransLink bus data...");
 		long start = System.currentTimeMillis();
 		this.serviceIds = extractUsefulServiceIds(args, this, true);
@@ -65,7 +68,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public boolean excludeCalendar(GCalendar gCalendar) {
+	public boolean excludeCalendar(@NotNull GCalendar gCalendar) {
 		if (this.serviceIds != null) {
 			return excludeUselessCalendar(gCalendar, this.serviceIds);
 		}
@@ -73,7 +76,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public boolean excludeCalendarDate(GCalendarDate gCalendarDates) {
+	public boolean excludeCalendarDate(@NotNull GCalendarDate gCalendarDates) {
 		if (this.serviceIds != null) {
 			return excludeUselessCalendarDate(gCalendarDates, this.serviceIds);
 		}
@@ -89,7 +92,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	);
 
 	@Override
-	public boolean excludeRoute(GRoute gRoute) {
+	public boolean excludeRoute(@NotNull GRoute gRoute) {
 		if (EXCLUDE_RSN.contains(gRoute.getRouteShortName())) {
 			return true;
 		}
@@ -97,13 +100,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public boolean excludeTrip(GTrip gTrip) {
+	public boolean excludeTrip(@NotNull GTrip gTrip) {
 		if (this.serviceIds != null) {
 			return excludeUselessTrip(gTrip, this.serviceIds);
 		}
 		return super.excludeTrip(gTrip);
 	}
 
+	@NotNull
 	@Override
 	public Integer getAgencyRouteType() {
 		return MAgency.ROUTE_TYPE_BUS;
@@ -124,7 +128,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private HashMap<Long, Long> routeOriginalIdToRSN = new HashMap<>();
 
 	@Override
-	public long getRouteId(GRoute gRoute) {
+	public long getRouteId(@NotNull GRoute gRoute) {
 		long rsn = -1L;
 		if (Utils.isDigitsOnly(gRoute.getRouteShortName())) {
 			rsn = Long.parseLong(gRoute.getRouteShortName()); // use route short name as route ID
@@ -144,16 +148,16 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		}
 		if (rsn == -1L) {
-			MTLog.logFatal("Unexpected route ID %s", gRoute);
-			return -1L;
+			throw new MTLog.Fatal("Unexpected route ID %s", gRoute);
 		}
 		this.routeOriginalIdToRSN.put(super.getRouteId(gRoute), rsn);
 		// TODO export original route ID
 		return super.getRouteId(gRoute); // useful to match with GTFS real-time
 	}
 
+	@Nullable
 	@Override
-	public String getRouteShortName(GRoute gRoute) {
+	public String getRouteShortName(@NotNull GRoute gRoute) {
 		String routeShortName = gRoute.getRouteShortName(); // used by real-time API
 		if (Utils.isDigitsOnly(routeShortName)) { // used by real-time API
 			routeShortName = String.valueOf(Integer.valueOf(routeShortName)); // used by real-time API
@@ -161,12 +165,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		return routeShortName; // used by real-time API
 	}
 
+	@NotNull
 	@Override
-	public String getRouteLongName(GRoute gRoute) {
-		return cleanRouteLongName(gRoute.getRouteLongName());
+	public String getRouteLongName(@NotNull GRoute gRoute) {
+		return cleanRouteLongName(gRoute.getRouteLongNameOrDefault());
 	}
 
-	private String cleanRouteLongName(String gRouteLongName) {
+	@NotNull
+	private String cleanRouteLongName(@NotNull String gRouteLongName) {
 		gRouteLongName = gRouteLongName.toLowerCase(Locale.ENGLISH);
 		gRouteLongName = CleanUtils.cleanSlashes(gRouteLongName);
 		gRouteLongName = S_F_U.matcher(gRouteLongName).replaceAll(S_F_U_REPLACEMENT);
@@ -179,6 +185,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final String AGENCY_COLOR = AGENCY_COLOR_BLUE;
 
+	@NotNull
 	@Override
 	public String getAgencyColor() {
 		return AGENCY_COLOR;
@@ -190,15 +197,16 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final String B_LINE = "B-LINE";
 
+	@Nullable
 	@Override
-	public String getRouteColor(GRoute gRoute) {
+	public String getRouteColor(@NotNull GRoute gRoute) {
 		if (gRoute.getRouteShortName().startsWith(N)) {
 			return NIGHT_BUS_COLOR;
 		}
 		if (gRoute.getRouteShortName().startsWith(R)) {
 			return RAPID_BUS_COLOR;
 		}
-		if (gRoute.getRouteLongName().contains(B_LINE)) {
+		if (gRoute.getRouteLongNameOrDefault().contains(B_LINE)) {
 			return B_LINE_BUS_COLOR;
 		}
 		return null; // use agency color
@@ -384,6 +392,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	static {
 		HashMap<Long, RouteTripSpec> map2 = new HashMap<>();
+		//noinspection deprecation
 		map2.put(38_311L, new RouteTripSpec(38_311L, // R2 // SPLITTED TO FIX SAME trip_headsign FOR 2 DIRECTIONS
 				0, MTrip.HEADSIGN_TYPE_STRING, PHIBBS_EXCHANGE, //
 				1, MTrip.HEADSIGN_TYPE_STRING, PARK_ROYAL) //
@@ -399,6 +408,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 								Stops.getALL_STOPS().get("61769") // EB Marine Dr @ South Mall Access Layover
 						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(20_667L, new RouteTripSpec(20_667L, // 555
 				0, MTrip.HEADSIGN_TYPE_STRING, CARVOLTH_EXCH, //
 				1, MTrip.HEADSIGN_TYPE_STRING, LOUGHEED_STATION) //
@@ -413,6 +423,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 								Stops.getALL_STOPS().get("58432") // LOUGHEED STN BAY 6
 						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(6_745L, new RouteTripSpec(6_745L, // 606
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
@@ -427,6 +438,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 								Stops.getALL_STOPS().get("57499") // NB 46A St @ River Rd W
 						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(6_746L, new RouteTripSpec(6_746L, // 608
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
@@ -441,6 +453,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 								Stops.getALL_STOPS().get("57529") // SB 46A St @ River Rd West
 						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(8_291L, new RouteTripSpec(8_291L, // 804
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
@@ -455,6 +468,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 								Stops.getALL_STOPS().get("54793") // Scottsdale Exch @ Bay 6
 						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(6_754L, new RouteTripSpec(6_754L, // 855
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
@@ -469,6 +483,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 								Stops.getALL_STOPS().get("56372") // EB 24 Ave @ 136 St
 						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(6_755L, new RouteTripSpec(6_755L, // 861
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.NORTH.getId(), //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.SOUTH.getId()) //
@@ -483,6 +498,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 								Stops.getALL_STOPS().get("53771") // NB Western Dr @ Eastern Dr
 						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(6_761L, new RouteTripSpec(6_761L, // 880
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
@@ -497,6 +513,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 								Stops.getALL_STOPS().get("54423") // Capilano University @ Bay 5
 						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(6_762L, new RouteTripSpec(6_762L, // 881
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.EAST.getId(), //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_DIRECTION, MDirectionType.WEST.getId()) //
@@ -519,23 +536,29 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public int compareEarly(long routeId, List<MTripStop> list1, List<MTripStop> list2, MTripStop ts1, MTripStop ts2, GStop ts1GStop, GStop ts2GStop) {
+	public int compareEarly(long routeId, @NotNull List<MTripStop> list1, @NotNull List<MTripStop> list2,
+							@NotNull MTripStop ts1, @NotNull MTripStop ts2,
+							@NotNull GStop ts1GStop, @NotNull GStop ts2GStop) {
 		if (ALL_ROUTE_TRIPS2.containsKey(routeId)) {
 			return ALL_ROUTE_TRIPS2.get(routeId).compare(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop, this);
 		}
 		return super.compareEarly(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop);
 	}
 
+	@NotNull
 	@Override
-	public ArrayList<MTrip> splitTrip(MRoute mRoute, GTrip gTrip, GSpec gtfs) {
+	public ArrayList<MTrip> splitTrip(@NotNull MRoute mRoute, @NotNull GTrip gTrip, @NotNull GSpec gtfs) {
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return ALL_ROUTE_TRIPS2.get(mRoute.getId()).getAllTrips();
 		}
 		return super.splitTrip(mRoute, gTrip, gtfs);
 	}
 
+	@NotNull
 	@Override
-	public Pair<Long[], Integer[]> splitTripStop(MRoute mRoute, GTrip gTrip, GTripStop gTripStop, ArrayList<MTrip> splitTrips, GSpec routeGTFS) {
+	public Pair<Long[], Integer[]> splitTripStop(@NotNull MRoute mRoute, @NotNull GTrip gTrip,
+												 @NotNull GTripStop gTripStop, @NotNull ArrayList<MTrip> splitTrips,
+												 @NotNull GSpec routeGTFS) {
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return SplitUtils.splitTripStop(mRoute, gTrip, gTripStop, routeGTFS, ALL_ROUTE_TRIPS2.get(mRoute.getId()), this);
 		}
@@ -543,7 +566,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
+	public void setTripHeadsign(@NotNull MRoute mRoute, @NotNull MTrip mTrip, @NotNull GTrip gTrip, @NotNull GSpec gtfs) {
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return; // split
 		}
@@ -573,11 +596,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				gTripHeadsign = gTripHeadsignBeforeVIA;
 			}
 		}
-		mTrip.setHeadsignString(cleanTripHeadsign(gTripHeadsign), gTrip.getDirectionId());
+		mTrip.setHeadsignString(cleanTripHeadsign(gTripHeadsign), gTrip.getDirectionIdOrDefault());
 	}
 
 	@Override
-	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
+	public boolean mergeHeadsign(@NotNull MTrip mTrip, @NotNull MTrip mTripToMerge) {
 		List<String> headsignsValues = Arrays.asList(mTrip.getHeadsignValue(), mTripToMerge.getHeadsignValue());
 		if (headsignsValues.contains(SPECIAL)) {
 			if (SPECIAL.equals(mTrip.getHeadsignValue())) {
@@ -1901,34 +1924,20 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final Pattern FLAG_STOP = Pattern.compile("((^flagstop)[\\s]*(.*$))", Pattern.CASE_INSENSITIVE);
 	private static final String FLAG_STOP_REPLACEMENT = "$3 ($2)";
 
-	private static final Pattern EASTBOUND_ = Pattern.compile("((^|\\W)(eastbound)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String EASTBOUND_REPLACEMENT = "$2" + "EB" + "$4";
-
-	private static final Pattern WESTBOUND_ = Pattern.compile("((^|\\W)(westbound)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String WESTBOUND_REPLACEMENT = "$2" + "WB" + "$4";
-
-	private static final Pattern NORTHBOUND_ = Pattern.compile("((^|\\W)(northbound)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String NORTHBOUND_REPLACEMENT = "$2" + "NB" + "$4";
-
-	private static final Pattern SOUTHBOUND_ = Pattern.compile("((^|\\W)(southbound)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String SOUTHBOUND_REPLACEMENT = "$2" + "SB" + "$4";
-
 	private static final Pattern UNLOADING = Pattern.compile("(unloading( only)?$)", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern ENDS_WITH_DASHES = Pattern.compile("([\\-]+$)", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern STARTS_WITH_AT = Pattern.compile("(^@ )", Pattern.CASE_INSENSITIVE);
 
+	@NotNull
 	@Override
-	public String cleanStopName(String gStopName) {
+	public String cleanStopName(@NotNull String gStopName) {
 		if (Utils.isUppercaseOnly(gStopName, true, true)) {
 			gStopName = gStopName.toLowerCase(Locale.ENGLISH);
 		}
 		gStopName = CleanUtils.cleanSlashes(gStopName);
-		gStopName = EASTBOUND_.matcher(gStopName).replaceAll(EASTBOUND_REPLACEMENT);
-		gStopName = WESTBOUND_.matcher(gStopName).replaceAll(WESTBOUND_REPLACEMENT);
-		gStopName = NORTHBOUND_.matcher(gStopName).replaceAll(NORTHBOUND_REPLACEMENT);
-		gStopName = SOUTHBOUND_.matcher(gStopName).replaceAll(SOUTHBOUND_REPLACEMENT);
+		gStopName = CleanUtils.cleanBounds(gStopName);
 		gStopName = CleanUtils.SAINT.matcher(gStopName).replaceAll(CleanUtils.SAINT_REPLACEMENT);
 		gStopName = AT_LIKE.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
 		gStopName = CleanUtils.CLEAN_AT.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
