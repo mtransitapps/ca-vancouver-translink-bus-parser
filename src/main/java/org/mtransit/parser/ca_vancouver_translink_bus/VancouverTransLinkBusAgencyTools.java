@@ -1320,12 +1320,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (rsn == 321L) {
 			if (Arrays.asList( //
-					SURREY_CENTRAL_STATION, //
+					SURREY_CENTRAL_STATION, // <>
 					NEW_WEST_STATION //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(NEW_WEST_STATION, mTrip.getHeadsignId());
 				return true;
 			} else if (Arrays.asList( //
+					SURREY_CENTRAL_STATION, //<>
 					NEWTON_EXCH, //
 					WHITE_ROCK + SPACE + CENTER_SHORT, //
 					WHITE_ROCK + SPACE + SOUTH, //
