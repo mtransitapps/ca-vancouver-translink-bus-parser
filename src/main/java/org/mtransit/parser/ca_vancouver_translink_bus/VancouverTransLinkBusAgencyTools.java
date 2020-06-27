@@ -1254,6 +1254,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(SPURAWAY, mTrip.getHeadsignId());
 				return true;
 			}
+			if (Arrays.asList( //
+					PARK_ROYAL, //
+					"Whitby Ests" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Whitby Ests", mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (rsn == 257L) {
 			if (Arrays.asList( //
 					PARK_ROYAL, //
