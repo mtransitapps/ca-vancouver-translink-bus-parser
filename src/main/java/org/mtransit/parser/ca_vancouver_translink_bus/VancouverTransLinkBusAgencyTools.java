@@ -1287,10 +1287,18 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (rsn == 262L) {
 			if (Arrays.asList( //
-					HORSESHOE_BAY, //
-					LIONS_BAY + "- " + BRUNSWICK //
+					HORSESHOE_BAY, // <>
+					LIONS_BAY + "- " + BRUNSWICK, //
+					LIONS_BAY + "-" + BRUNSWICK //
 			).containsAll(headsignsValues)) {
-				mTrip.setHeadsignString(LIONS_BAY + "- " + BRUNSWICK, mTrip.getHeadsignId());
+				mTrip.setHeadsignString(LIONS_BAY + "-" + BRUNSWICK, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					HORSESHOE_BAY, // <>
+					"Caulfeild" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Caulfeild", mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (rsn == 281L) {
