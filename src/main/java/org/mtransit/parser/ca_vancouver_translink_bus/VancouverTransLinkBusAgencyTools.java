@@ -150,9 +150,10 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		if (rsn == -1L) {
 			throw new MTLog.Fatal("Unexpected route ID %s", gRoute);
 		}
-		this.routeOriginalIdToRSN.put(super.getRouteId(gRoute), rsn);
+		long routeId = Long.parseLong(CleanUtils.cleanMergedID(gRoute.getRouteId())); // useful to match with GTFS real-time
+		this.routeOriginalIdToRSN.put(routeId, rsn);
 		// TODO export original route ID
-		return super.getRouteId(gRoute); // useful to match with GTFS real-time
+		return routeId;
 	}
 
 	@Nullable
@@ -692,11 +693,27 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(DOWNTOWN, mTrip.getHeadsignId());
 				return true;
-			} else if (Arrays.asList( //
+			}
+			if (Arrays.asList( //
+					_63RD, //
+					DAVIE, //
+					"Waterfront Sta"
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Waterfront Sta", mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
 					MARPOLE, //
 					GRANVILLE //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(GRANVILLE, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					MARPOLE, //
+					"Marine Dr Sta"
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Marine Dr Sta", mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (rsn == 14L) {
@@ -1390,6 +1407,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (rsn == 351L) {
 			if (Arrays.asList( //
+					"Whte Rock" + SPACE + CENTER_SHORT, //
+					WHITE_ROCK + SPACE + CENTER_SHORT //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(WHITE_ROCK + SPACE + CENTER_SHORT, mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
 					WHITE_ROCK + SPACE + CENTER_SHORT, //
 					"S Sry " + "Pk & Ride", //
 					CRESCENT_BEACH //
@@ -1562,6 +1586,14 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 					LOUGHEED_STATION //
 			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString(LOUGHEED_STATION, mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (rsn == 564L) {
+			if (Arrays.asList( //
+					"Willowbrook Mall", //
+					WILLOWBROOK //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(WILLOWBROOK, mTrip.getHeadsignId());
 				return true;
 			}
 		} else if (rsn == 595L) {
@@ -1837,8 +1869,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			}
 		}
-		MTLog.logFatal("Unexpected trips to merge %s & %s!", mTrip, mTripToMerge);
-		return false;
+		throw new MTLog.Fatal("%d: Unexpected trips to merge %s & %s!", rsn, mTrip, mTripToMerge);
 	}
 
 	private static final Pattern TO = Pattern.compile("((^|\\W)(to)(\\W|$))", Pattern.CASE_INSENSITIVE);
