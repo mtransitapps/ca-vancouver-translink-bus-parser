@@ -1655,6 +1655,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			}
 		} else if (rsn == 640L) {
 			if (Arrays.asList( //
+					"Tilbury", //
 					"Tillbury", //
 					LADNER_EXCH //
 			).containsAll(headsignsValues)) {
