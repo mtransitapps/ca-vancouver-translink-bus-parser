@@ -1483,6 +1483,13 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString(RIVERPORT, mTrip.getHeadsignId());
 				return true;
 			}
+			if (Arrays.asList( //
+					BRIGHOUSE, //
+					BRIGHOUSE_STATION //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString(BRIGHOUSE_STATION, mTrip.getHeadsignId());
+				return true;
+			}
 		} else if (rsn == 410L) {
 			if (Arrays.asList( //
 					StringUtils.EMPTY, // <>
