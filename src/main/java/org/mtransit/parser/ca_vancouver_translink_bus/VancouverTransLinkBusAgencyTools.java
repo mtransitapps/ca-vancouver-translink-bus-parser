@@ -271,6 +271,9 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern REMOVE_DASH = Pattern.compile("(^(\\s)*-(\\s)*|(\\s)*-(\\s)*$)", Pattern.CASE_INSENSITIVE);
 
+	private static final Pattern CLEAN_DASH = Pattern.compile("(\\s*-\\s*)", Pattern.CASE_INSENSITIVE);
+	private static final String CLEAN_DASH_REPLACEMENT = "-";
+
 	@NotNull
 	@Override
 	public String cleanTripHeadsign(@NotNull String tripHeadsign) {
@@ -297,6 +300,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = SPECIAL_.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = ONLY.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = REMOVE_DASH.matcher(tripHeadsign).replaceAll(EMPTY);
+		tripHeadsign = CLEAN_DASH.matcher(tripHeadsign).replaceAll(CLEAN_DASH_REPLACEMENT);
 		tripHeadsign = CleanUtils.fixMcXCase(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanNumbers(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanStreetTypes(tripHeadsign);
