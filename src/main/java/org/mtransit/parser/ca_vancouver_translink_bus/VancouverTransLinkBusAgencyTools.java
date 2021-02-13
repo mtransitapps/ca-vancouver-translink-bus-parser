@@ -2,11 +2,11 @@ package org.mtransit.parser.ca_vancouver_translink_bus;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mtransit.parser.CleanUtils;
+import org.mtransit.commons.CleanUtils;
+import org.mtransit.commons.StringUtils;
 import org.mtransit.parser.ColorUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.MTLog;
-import org.mtransit.parser.StringUtils;
 import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
 import org.mtransit.parser.gtfs.data.GCalendarDate;
@@ -133,7 +133,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@NotNull
-	private String cleanRouteLongName(@NotNull String gRouteLongName) {
+	@Override
+	public String cleanRouteLongName(@NotNull String gRouteLongName) {
 		gRouteLongName = CleanUtils.toLowerCaseUpperCaseWords(Locale.ENGLISH, gRouteLongName, getIgnoredWords());
 		gRouteLongName = CleanUtils.cleanSlashes(gRouteLongName);
 		gRouteLongName = CleanUtils.cleanStreetTypes(gRouteLongName);
