@@ -1,30 +1,20 @@
 package org.mtransit.parser.ca_vancouver_translink_bus;
 
+import static org.mtransit.commons.StringUtils.EMPTY;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mtransit.commons.CleanUtils;
-import org.mtransit.commons.StringUtils;
 import org.mtransit.parser.ColorUtils;
 import org.mtransit.parser.DefaultAgencyTools;
-import org.mtransit.parser.MTLog;
-import org.mtransit.parser.Utils;
-import org.mtransit.parser.gtfs.data.GCalendar;
-import org.mtransit.parser.gtfs.data.GCalendarDate;
 import org.mtransit.parser.gtfs.data.GRoute;
-import org.mtransit.parser.gtfs.data.GSpec;
 import org.mtransit.parser.gtfs.data.GStop;
-import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
-import org.mtransit.parser.mt.data.MRoute;
-import org.mtransit.parser.mt.data.MTrip;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
-
-import static org.mtransit.parser.StringUtils.EMPTY;
 
 // http://www.translink.ca/en/Schedules-and-Maps/Developer-Resources.aspx
 // http://www.translink.ca/en/Schedules-and-Maps/Developer-Resources/GTFS-Data.aspx
@@ -34,47 +24,25 @@ import static org.mtransit.parser.StringUtils.EMPTY;
 // http://gtfs.translink.ca/static/latest
 public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
-	public static void main(@Nullable String[] args) {
-		if (args == null || args.length == 0) {
-			args = new String[3];
-			args[0] = "input/gtfs.zip";
-			args[1] = "../../mtransitapps/ca-vancouver-translink-bus-android/res/raw/";
-			args[2] = ""; // files-prefix
-		}
+	public static void main(@NotNull String[] args) {
 		new VancouverTransLinkBusAgencyTools().start(args);
 	}
 
 	@Nullable
-	private HashSet<Integer> serviceIdInts;
-
 	@Override
-	public void start(@NotNull String[] args) {
-		MTLog.log("Generating TransLink bus data...");
-		long start = System.currentTimeMillis();
-		this.serviceIdInts = extractUsefulServiceIdInts(args, this, true);
-		super.start(args);
-		MTLog.log("Generating TransLink bus data... DONE in %s.", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+	public List<Locale> getSupportedLanguages() {
+		return LANG_EN;
 	}
 
 	@Override
-	public boolean excludingAll() {
-		return this.serviceIdInts != null && this.serviceIdInts.isEmpty();
+	public boolean defaultExcludeEnabled() {
+		return true;
 	}
 
+	@NotNull
 	@Override
-	public boolean excludeCalendar(@NotNull GCalendar gCalendar) {
-		if (this.serviceIdInts != null) {
-			return excludeUselessCalendarInt(gCalendar, this.serviceIdInts);
-		}
-		return super.excludeCalendar(gCalendar);
-	}
-
-	@Override
-	public boolean excludeCalendarDate(@NotNull GCalendarDate gCalendarDates) {
-		if (this.serviceIdInts != null) {
-			return excludeUselessCalendarDateInt(gCalendarDates, this.serviceIdInts);
-		}
-		return super.excludeCalendarDate(gCalendarDates);
+	public String getAgencyName() {
+		return "TransLink";
 	}
 
 	private static final List<String> EXCLUDE_RSN = Arrays.asList(
@@ -93,14 +61,6 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		return super.excludeRoute(gRoute);
 	}
 
-	@Override
-	public boolean excludeTrip(@NotNull GTrip gTrip) {
-		if (this.serviceIdInts != null) {
-			return excludeUselessTripInt(gTrip, this.serviceIdInts);
-		}
-		return super.excludeTrip(gTrip);
-	}
-
 	@NotNull
 	@Override
 	public Integer getAgencyRouteType() {
@@ -111,25 +71,33 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	private static final String R = "R";
 
 	@Override
+	public boolean defaultRouteIdEnabled() {
+		return true;
+	}
+
+	@Override
+	public boolean useRouteShortNameForRouteId() {
+		return false; // route ID required for GTFS-RT
+	}
+
+	@Override
 	public long getRouteId(@NotNull GRoute gRoute) {
 		//noinspection deprecation
 		return Long.parseLong(CleanUtils.cleanMergedID(gRoute.getRouteId())); // useful to match with GTFS real-time;
 	}
 
-	@Nullable
-	@Override
-	public String getRouteShortName(@NotNull GRoute gRoute) {
-		String routeShortName = gRoute.getRouteShortName(); // used by real-time API
-		if (Utils.isDigitsOnly(routeShortName)) { // used by real-time API
-			routeShortName = String.valueOf(Integer.valueOf(routeShortName)); // used by real-time API
-		} // used by real-time API
-		return routeShortName; // used by real-time API
-	}
+	private static final Pattern START_W_0_ = Pattern.compile("(^0+)");
 
 	@NotNull
 	@Override
-	public String getRouteLongName(@NotNull GRoute gRoute) {
-		return cleanRouteLongName(gRoute.getRouteLongNameOrDefault());
+	public String cleanRouteShortName(@NotNull String routeShortName) { // used by real-time API
+		routeShortName = START_W_0_.matcher(routeShortName).replaceAll(EMPTY); // used by real-time API
+		return super.cleanRouteShortName(routeShortName); // used by real-time API
+	}
+
+	@Override
+	public boolean defaultRouteLongNameEnabled() {
+		return true;
 	}
 
 	@NotNull
@@ -139,6 +107,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		gRouteLongName = CleanUtils.cleanSlashes(gRouteLongName);
 		gRouteLongName = CleanUtils.cleanStreetTypes(gRouteLongName);
 		return CleanUtils.cleanLabel(gRouteLongName);
+	}
+
+	@Override
+	public boolean defaultAgencyColorEnabled() {
+		return true;
 	}
 
 	private static final String AGENCY_COLOR_BLUE = "0761A5"; // BLUE (merge)
@@ -159,34 +132,28 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	@Nullable
 	@Override
-	public String getRouteColor(@NotNull GRoute gRoute) {
-		String gRouteColor = gRoute.getRouteColor();
-		if (ColorUtils.WHITE.equalsIgnoreCase(gRouteColor)) {
-			gRouteColor = null;
+	public String fixColor(@Nullable String color) {
+		if (ColorUtils.WHITE.equalsIgnoreCase(color)) {
+			return null;
 		}
-		if (StringUtils.isEmpty(gRouteColor)) {
-			final String rsn = gRoute.getRouteShortName();
-			final String rln = gRoute.getRouteLongNameOrDefault();
-			if (rsn.startsWith(N)) {
-				return NIGHT_BUS_COLOR;
-			}
-			if (rsn.startsWith(R)) {
-				return RAPID_BUS_COLOR;
-			}
-			if (rln.contains(B_LINE)) {
-				return B_LINE_BUS_COLOR;
-			}
-			return null; // use agency color
-		}
-		return super.getRouteColor(gRoute);
+		return super.fixColor(color);
 	}
 
+	@Nullable
 	@Override
-	public void setTripHeadsign(@NotNull MRoute mRoute, @NotNull MTrip mTrip, @NotNull GTrip gTrip, @NotNull GSpec gtfs) {
-		mTrip.setHeadsignString(
-				cleanTripHeadsign(gTrip.getTripHeadsignOrDefault()),
-				gTrip.getDirectionIdOrDefault()
-		);
+	public String provideMissingRouteColor(@NotNull GRoute gRoute) {
+		final String rsn = gRoute.getRouteShortName();
+		final String rln = gRoute.getRouteLongNameOrDefault();
+		if (rsn.startsWith(N)) {
+			return NIGHT_BUS_COLOR;
+		}
+		if (rsn.startsWith(R)) {
+			return RAPID_BUS_COLOR;
+		}
+		if (rln.contains(B_LINE)) {
+			return B_LINE_BUS_COLOR;
+		}
+		return null; // use agency color
 	}
 
 	@Override
@@ -213,11 +180,6 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 			directionHeadSign = CleanUtils.cleanLabel(directionHeadSign);
 		}
 		return directionHeadSign;
-	}
-
-	@Override
-	public boolean mergeHeadsign(@NotNull MTrip mTrip, @NotNull MTrip mTripToMerge) {
-		throw new MTLog.Fatal("%d: Unexpected trips to merge %s & %s!", mTrip.getRouteId(), mTrip, mTripToMerge);
 	}
 
 	private static final Pattern STARTS_WITH_QUOTE = Pattern.compile("(^\")", Pattern.CASE_INSENSITIVE);
