@@ -75,15 +75,24 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		return true;
 	}
 
+	@NotNull
+	@Override
+	public String cleanRouteOriginalId(@NotNull String gRouteId) {
+		return CleanUtils.cleanMergedID(gRouteId);
+	}
+
 	@Override
 	public boolean useRouteShortNameForRouteId() {
 		return false; // route ID required for GTFS-RT
 	}
 
+	@Nullable
 	@Override
-	public long getRouteId(@NotNull GRoute gRoute) {
-		//noinspection deprecation
-		return Long.parseLong(CleanUtils.cleanMergedID(gRoute.getRouteId())); // useful to match with GTFS real-time;
+	public Long convertRouteIdFromShortNameNotSupported(@NotNull String routeShortName) {
+		switch(routeShortName) {
+			case "HD": return 100_000L;
+			default: return null;
+		}
 	}
 
 	private static final Pattern START_W_0_ = Pattern.compile("(^0+)");
