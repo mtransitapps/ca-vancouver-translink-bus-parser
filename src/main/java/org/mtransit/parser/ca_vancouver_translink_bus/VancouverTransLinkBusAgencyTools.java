@@ -5,6 +5,7 @@ import static org.mtransit.commons.StringUtils.EMPTY;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mtransit.commons.CleanUtils;
+import org.mtransit.commons.provider.CaVancouverTransLinkProviderCommons;
 import org.mtransit.parser.ColorUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.gtfs.data.GRoute;
@@ -89,9 +90,11 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	@Nullable
 	@Override
 	public Long convertRouteIdFromShortNameNotSupported(@NotNull String routeShortName) {
-		switch(routeShortName) {
-			case "HD": return 100_000L;
-			default: return null;
+		switch (routeShortName) {
+		case "HD":
+			return 100_000L;
+		default:
+			return null;
 		}
 	}
 
@@ -112,7 +115,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	@NotNull
 	@Override
 	public String cleanRouteLongName(@NotNull String gRouteLongName) {
-		gRouteLongName = CleanUtils.toLowerCaseUpperCaseWords(Locale.ENGLISH, gRouteLongName, getIgnoredWords());
+		gRouteLongName = CleanUtils.toLowerCaseUpperCaseWords(Locale.ENGLISH, gRouteLongName, CaVancouverTransLinkProviderCommons.getIgnoredWords());
 		gRouteLongName = CleanUtils.cleanSlashes(gRouteLongName);
 		gRouteLongName = CleanUtils.cleanStreetTypes(gRouteLongName);
 		return CleanUtils.cleanLabel(gRouteLongName);
@@ -205,43 +208,7 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern ONLY = Pattern.compile("(-?( only|only )-?)", Pattern.CASE_INSENSITIVE);
 
-	private static final String PORT_COQUITLAM_SHORT = "PoCo";
-	private static final Pattern PORT_COQUITLAM = Pattern.compile("((^|\\W)(port coquitlam|pt coquitlam|poco)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String PORT_COQUITLAM_REPLACEMENT = "$2" + PORT_COQUITLAM_SHORT + "$4";
-
-	private static final String COQUITLAM_SHORT = "Coq";
-	private static final Pattern COQUITLAM = Pattern.compile("((^|\\W)(coquitlam|coq)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String COQUITLAM_REPLACEMENT = "$2" + COQUITLAM_SHORT + "$4";
-
-	private static final String STATION_SHORT = "Sta"; // see @CleanUtils
-	private static final Pattern STATION = Pattern.compile("((^|\\W)(stn|sta|station)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String STATION_REPLACEMENT = "$2" + STATION_SHORT + "$4";
-
-	private static final String PORT_SHORT = "Pt"; // like GTFS & real-time API
-	private static final Pattern PORT = Pattern.compile("((^|\\W)(port)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String PORT_REPLACEMENT = "$2" + PORT_SHORT + "$4";
-
 	private static final Pattern NIGHTBUS = Pattern.compile("((^|\\s)(nightbus)(\\s|$))", Pattern.CASE_INSENSITIVE);
-
-	private static final String SURREY_SHORT = "Sry";
-	private static final Pattern SURREY_ = Pattern.compile("((^|\\s)(surrey)(\\s|$))", Pattern.CASE_INSENSITIVE);
-	private static final String SURREY_REPLACEMENT = "$2" + SURREY_SHORT + "$4";
-
-	private static final Pattern ENDS_WITH_B_LINE = Pattern.compile("((^|\\s)(- )?(b-line)(\\s|$))", Pattern.CASE_INSENSITIVE);
-
-	private static final String UBC = "UBC";
-	private static final Pattern U_B_C = Pattern.compile("((^|\\W)(u b c)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String U_B_C_REPLACEMENT = "$2" + UBC + "$4";
-
-	private static final String CENTRAL_SHORT = "Ctrl";
-	private static final Pattern CENTRAL = Pattern.compile("((^|\\W)(central)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String CENTRAL_REPLACEMENT = "$2" + CENTRAL_SHORT + "$4";
-
-	private static final String BRAID_STATION = "Braid " + STATION_SHORT;
-	private static final Pattern BRAID_STATION_ = Pattern.compile("((^|\\W)(brad stn)(\\W|$))", Pattern.CASE_INSENSITIVE);
-	private static final String BRAID_STATION_REPLACEMENT = "$2" + BRAID_STATION + "$4";
-
-	private static final Pattern REMOVE_DASH = Pattern.compile("(^(\\s)*-(\\s)*|(\\s)*-(\\s)*$)", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern CLEAN_DASH = Pattern.compile("(\\s*-\\s*)", Pattern.CASE_INSENSITIVE);
 	private static final String CLEAN_DASH_REPLACEMENT = "-";
@@ -249,34 +216,18 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 	@NotNull
 	@Override
 	public String cleanTripHeadsign(@NotNull String tripHeadsign) {
-		tripHeadsign = CleanUtils.toLowerCaseUpperCaseWords(Locale.ENGLISH, tripHeadsign, getIgnoredWords());
-		tripHeadsign = CleanUtils.keepToAndRemoveVia(tripHeadsign);
-		tripHeadsign = CleanUtils.cleanSlashes(tripHeadsign);
 		tripHeadsign = STARTS_WITH_QUOTE.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = ENDS_WITH_QUOTE.matcher(tripHeadsign).replaceAll(EMPTY);
+		tripHeadsign = CleanUtils.removeVia(tripHeadsign);
+		tripHeadsign = CaVancouverTransLinkProviderCommons.cleanTripHeadsign(tripHeadsign);
 		tripHeadsign = STARTS_WITH_ROUTE.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = STARTS_WITH_SLASH.matcher(tripHeadsign).replaceAll(EMPTY);
-		tripHeadsign = ENDS_WITH_B_LINE.matcher(tripHeadsign).replaceAll(EMPTY);
-		tripHeadsign = CleanUtils.CLEAN_AND.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
-		tripHeadsign = CleanUtils.CLEAN_AT.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
-		tripHeadsign = CENTRAL.matcher(tripHeadsign).replaceAll(CENTRAL_REPLACEMENT);
-		tripHeadsign = U_B_C.matcher(tripHeadsign).replaceAll(U_B_C_REPLACEMENT);
-		tripHeadsign = BRAID_STATION_.matcher(tripHeadsign).replaceAll(BRAID_STATION_REPLACEMENT);
-		tripHeadsign = PORT_COQUITLAM.matcher(tripHeadsign).replaceAll(PORT_COQUITLAM_REPLACEMENT);
-		tripHeadsign = COQUITLAM.matcher(tripHeadsign).replaceAll(COQUITLAM_REPLACEMENT);
-		tripHeadsign = STATION.matcher(tripHeadsign).replaceAll(STATION_REPLACEMENT);
-		tripHeadsign = SURREY_.matcher(tripHeadsign).replaceAll(SURREY_REPLACEMENT);
-		tripHeadsign = PORT.matcher(tripHeadsign).replaceAll(PORT_REPLACEMENT);
 		tripHeadsign = NIGHTBUS.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = EXPRESS.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = SPECIAL_.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = ONLY.matcher(tripHeadsign).replaceAll(EMPTY);
-		tripHeadsign = REMOVE_DASH.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = CLEAN_DASH.matcher(tripHeadsign).replaceAll(CLEAN_DASH_REPLACEMENT);
-		tripHeadsign = CleanUtils.fixMcXCase(tripHeadsign);
-		tripHeadsign = CleanUtils.cleanNumbers(tripHeadsign);
-		tripHeadsign = CleanUtils.cleanStreetTypes(tripHeadsign);
-		return CleanUtils.cleanLabel(tripHeadsign);
+		return tripHeadsign;
 	}
 
 	private static final Pattern FLAG_STOP = Pattern.compile("((^flagstop)[\\s]*(.*$))", Pattern.CASE_INSENSITIVE);
@@ -288,19 +239,10 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern STARTS_WITH_AT = Pattern.compile("(^@ )", Pattern.CASE_INSENSITIVE);
 
-	private String[] getIgnoredWords() {
-		return new String[]{
-				"FS", "NS",
-				"AM", "PM",
-				"SW", "NW", "SE", "NE",
-				"UBC", "SFU", "VCC",
-		};
-	}
-
 	@NotNull
 	@Override
 	public String cleanStopName(@NotNull String gStopName) {
-		gStopName = CleanUtils.toLowerCaseUpperCaseWords(Locale.ENGLISH, gStopName, getIgnoredWords());
+		gStopName = CleanUtils.toLowerCaseUpperCaseWords(Locale.ENGLISH, gStopName, CaVancouverTransLinkProviderCommons.getIgnoredWords());
 		gStopName = CleanUtils.cleanSlashes(gStopName);
 		gStopName = CleanUtils.cleanBounds(gStopName);
 		gStopName = CleanUtils.fixMcXCase(gStopName);
@@ -310,8 +252,8 @@ public class VancouverTransLinkBusAgencyTools extends DefaultAgencyTools {
 		gStopName = FLAG_STOP.matcher(gStopName).replaceAll(FLAG_STOP_REPLACEMENT);
 		gStopName = UNLOADING.matcher(gStopName).replaceAll(EMPTY);
 		gStopName = ENDS_WITH_DASHES.matcher(gStopName).replaceAll(EMPTY);
-		gStopName = STATION.matcher(gStopName).replaceAll(STATION_REPLACEMENT);
-		gStopName = CENTRAL.matcher(gStopName).replaceAll(CENTRAL_REPLACEMENT);
+		gStopName = CaVancouverTransLinkProviderCommons.STATION.matcher(gStopName).replaceAll(CaVancouverTransLinkProviderCommons.STATION_REPLACEMENT);
+		gStopName = CaVancouverTransLinkProviderCommons.CENTRAL.matcher(gStopName).replaceAll(CaVancouverTransLinkProviderCommons.CENTRAL_REPLACEMENT);
 		gStopName = STARTS_WITH_AT.matcher(gStopName).replaceAll(EMPTY);
 		gStopName = CleanUtils.cleanStreetTypes(gStopName);
 		return CleanUtils.cleanLabel(gStopName);
